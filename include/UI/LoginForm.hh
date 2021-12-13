@@ -1,0 +1,24 @@
+
+#pragma once
+
+#include <functional>
+#include <optional>
+#include <string>
+
+#include <FL/Fl.H>
+#include <FL/Fl_Button.H>
+#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Input.H>
+
+#include "Connection.hh"
+
+class LoginForm {
+public:
+  LoginForm(Connection &con);
+  void show();
+
+private:
+  void cb_Login_i(Fl_Button *, LoginForm *);
+  static void cb_Login(Fl_Button *, LoginForm *);
+  Connection &connection;
+};
