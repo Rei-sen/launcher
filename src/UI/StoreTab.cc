@@ -1,8 +1,10 @@
 
-#include "UI/StoreGroup.hh"
+#include "UI/StoreTab.hh"
 
-StoreGroup::StoreGroup(int X, int Y, int W, int H, const char *L)
-    : Fl_Group(X, Y, W, H, L) {
+#include <FL/Fl_Browser.H>
+#include <FL/Fl_Button.H>
+
+StoreTab::StoreTab(State &s) : Tab("Store", s) {
   { new Fl_Browser(10, 75, 221, 370); } // Fl_Browser* o
   {
     Fl_Input *o = new Fl_Input(10, 35, 139, 30);

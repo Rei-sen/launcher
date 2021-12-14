@@ -5,11 +5,14 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Tabs.H>
 
-#include "UI/GameLibGroup.hh"
-#include "UI/PublisherGroup.hh"
-#include "UI/StoreGroup.hh"
+#include "UI/GameLibTab.hh"
+#include "UI/PublisherTab.hh"
+#include "UI/StoreTab.hh"
 
-class MainWindow {
+class MainWindow : public Fl_Double_Window {
 public:
-  Fl_Double_Window *show();
+  MainWindow(State &s);
+  virtual ~MainWindow() = default;
+
+private:
 };

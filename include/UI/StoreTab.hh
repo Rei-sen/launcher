@@ -2,22 +2,21 @@
 
 #pragma once
 
-#include <FL/Fl.H>
-#include <FL/Fl_Browser.H>
-#include <FL/Fl_Button.H>
-#include <FL/Fl_Group.H>
-#include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Text_Display.H>
 
-class StoreGroup : public Fl_Group {
+#include "UI/Tab.hh"
+
+class StoreTab : public Tab {
 public:
-  StoreGroup(int X, int Y, int W, int H, const char *L = 0);
+  StoreTab(const StoreTab &) = delete;
+  StoreTab &operator=(const StoreTab &) = delete;
+  virtual ~StoreTab() = default;
+
+  StoreTab(State &s);
 
 private:
   Fl_Output *priceLabel;
   Fl_Output *statusLabel;
-
-public:
   Fl_Text_Display *description;
 };

@@ -39,11 +39,15 @@ int main(int argc, char **argv) {
   sqlite3_finalize(res);
   sqlite3_close(db);
 
+  /* oczywiście to co wyżej do usunięcia a to co niżej do poprawy */
   Connection c;
   LoginForm f(c);
   f.show();
 
-  MainWindow w;
-  w.show()->show();
+  State state;
+
+  MainWindow w(state);
+  w.show();
+
   return Fl::run();
 }
