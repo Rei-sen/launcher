@@ -2,7 +2,10 @@
 #include "UI/MainWindow.hh"
 
 #include "UI/GameLibTab.hh"
+#include "UI/NewsTab.hh"
 #include "UI/PublisherTab.hh"
+#include "UI/SettingsTab.hh"
+#include "UI/SocialMediaTab.hh"
 #include "UI/StoreTab.hh"
 
 MainWindow::MainWindow(State &s)
@@ -15,7 +18,10 @@ MainWindow::MainWindow(State &s)
       o->show();
     }                      // StoreTab* o
     { new GameLibTab(s); } // GameLibTab* o
-    if (true)              // zamienić na state.user.hasPublisherAccess()
+    new SocialMediaTab(s);
+    new NewsTab(s);
+    new SettingsTab(s);
+    if (true) // zamienić na state.user.hasPublisherAccess()
     {
       new PublisherTab(s);
     } // PublisherGroup* o
