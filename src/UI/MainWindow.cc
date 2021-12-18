@@ -13,9 +13,12 @@ MainWindow::MainWindow(State &s)
     {
       Fl_Group *o = new StoreTab(s);
       o->show();
-    }                        // StoreTab* o
-    { new GameLibTab(s); }   // GameLibTab* o
-    { new PublisherTab(s); } // PublisherGroup* o
+    }                      // StoreTab* o
+    { new GameLibTab(s); } // GameLibTab* o
+    if (true)              // zamienić na state.user.hasPublisherAccess()
+    {
+      new PublisherTab(s);
+    } // PublisherGroup* o
     tabs->end();
   } // Fl_Tabs* o
   end();
