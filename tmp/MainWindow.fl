@@ -1,0 +1,43 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.hh}
+code_name {.cc}
+decl {\#include "UI/StoreGroup.hh"} {public global
+}
+
+decl {\#include "UI/GameLibGroup.hh"} {public global
+}
+
+decl {\#include "UI/PublisherGroup.hh"} {public global
+}
+
+class MainWindow {open
+} {
+  Function {show()} {open
+  } {
+    Fl_Window {} {
+      label {Game launcher} open
+      xywh {495 376 625 455} type Double visible
+    } {
+      Fl_Tabs {} {open
+        xywh {0 0 625 455}
+      } {
+        Fl_Group {} {
+          label Store open
+          xywh {0 25 625 430} hide
+          class StoreGroup
+        } {}
+        Fl_Group {} {
+          label {Game library} open selected
+          xywh {0 25 625 430}
+          class GameLibGroup
+        } {}
+        Fl_Group {} {
+          label Publisher open
+          xywh {0 25 625 430} hide
+          class PublisherGroup
+        } {}
+      }
+    }
+  }
+}

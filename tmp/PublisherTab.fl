@@ -1,0 +1,78 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.hh}
+code_name {.cc}
+widget_class PublisherTab {open
+  xywh {2872 131 625 455} type Double
+  class Tab visible
+} {
+  Fl_Scroll {} {open
+    xywh {0 25 625 430} type VERTICAL
+  } {
+    Fl_Group {} {
+      label Games open
+      xywh {10 57 590 150} align 5
+    } {
+      Fl_Browser {} {
+        xywh {10 67 156 125} type Select
+      }
+      Fl_Input {} {
+        label Name selected
+        xywh {210 70 140 30}
+      }
+      Fl_Input {} {
+        label Price
+        xywh {210 110 140 30} type Float
+      }
+      Fl_Text_Editor {} {
+        label Description
+        xywh {360 70 230 122}
+      }
+      Fl_Button {} {
+        label Update
+        xywh {278 172 72 20}
+      }
+    }
+    Fl_Group {} {
+      label News open
+      xywh {5 239 595 206} align 5
+    } {
+      Fl_Tree {} {
+        xywh {10 245 155 170}
+      }
+      Fl_Input {} {
+        label title
+        xywh {230 245 360 30}
+      }
+      Fl_Button {} {
+        label {Update/Add}
+        xywh {500 410 90 25}
+      }
+      Fl_Text_Editor {} {
+        label Content
+        xywh {230 285 360 115} align 4
+      }
+    }
+    Fl_Group {} {
+      label {Social media} open
+      xywh {10 472 589 46} align 5
+    } {
+      Fl_Input {} {
+        label Address
+        xywh {272 478 153 30}
+      }
+      Fl_Button {} {
+        label Update
+        xywh {435 478 69 30}
+      }
+      Fl_Choice {} {
+        label Platform open
+        xywh {84 478 120 30} down_box BORDER_BOX
+      } {}
+      Fl_Button {} {
+        label {Add new}
+        xywh {514 478 75 30}
+      }
+    }
+  }
+}
