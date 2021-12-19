@@ -1,0 +1,21 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.hh}
+code_name {.cc}
+widget_class StoreTab {open
+  xywh {2933 545 625 455} type Double
+  class Tab visible
+} {
+  Fl_Input {} {
+    label Username
+    xywh {250 175 135 30}
+  }
+  Fl_Button {} {
+    label Update
+    xywh {280 255 72 25}
+  }
+  Fl_Input {} {
+    label Password
+    xywh {250 215 135 30}
+  }
+}
