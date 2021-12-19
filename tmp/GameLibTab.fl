@@ -1,0 +1,43 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0308
+header_name {.hh}
+code_name {.cc}
+widget_class StoreTab {open selected
+  xywh {2933 545 625 455} type Double
+  class Tab visible
+} {
+  Fl_Browser {} {
+    xywh {10 75 221 370}
+  }
+  Fl_Input {} {
+    xywh {10 35 139 30} align 0
+  }
+  Fl_Button {} {
+    label search
+    xywh {159 35 72 30}
+  }
+  Fl_Group {} {open
+    xywh {241 35 374 410} box DOWN_BOX
+  } {
+    Fl_Output {} {
+      label Name
+      xywh {302 45 303 30}
+    }
+    Fl_Button {} {
+      label Play
+      xywh {533 85 72 30} deactivate
+    }
+    Fl_Table {} {
+      label DLC open
+      xywh {251 150 354 285}
+    } {}
+    Fl_Button {} {
+      label Install
+      xywh {451 85 72 30} deactivate
+    }
+    Fl_Button {} {
+      label Uninstall
+      xywh {369 85 72 30} deactivate
+    }
+  }
+}
