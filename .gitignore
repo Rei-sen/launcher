@@ -38,4 +38,4 @@ build/
 *.exe
 *.out
 *.app
-*.db
+*.sqlt
