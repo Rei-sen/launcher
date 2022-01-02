@@ -18,12 +18,5 @@ public:
   void show();
 
 private:
-<<<<<<< HEAD
-
-  static void cb_Login(Fl_Button *, LoginForm *);
-
-
-=======
->>>>>>> e8cd054f86785f125268187277261f0ecb373539
   Connection &connection;
 };
