@@ -18,7 +18,5 @@ public:
   void show();
 
 private:
-  void cb_Login_i(Fl_Button *, LoginForm *);
-  static void cb_Login(Fl_Button *, LoginForm *);
   Connection &connection;
 };
