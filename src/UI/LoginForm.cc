@@ -20,16 +20,49 @@ void LoginForm::show() {
   win->end();
   win->show();
 
+
   while (true) {
     Fl::wait();
     Fl_Widget *o;
 
     while ((o = Fl::readqueue())) {
       if (cancelButton == o) {
+        // zamiast tego ni¿ej potem dodaæ wy³¹czanie aplikacji
         win->hide();
         return;
       } else if (registerButton == o) {
+        // obecnie 1 bo nie ma jeszcze metody z klasy connection
+        if (1) {
+//        if (!(connection.login(userName->value(),
+//        password->value()))) {
+//          std::string uName = loginInput->value();
+//          std::string uPass = passwordInput->value();
+//        obecnie 1 bo nie ma jeszcze metody z klasy connection
+          if (1) {
+//        if (uName.length() && uPass.length() &&
+//              connection.register(uName, uPass)) {
+//          dodaæ przekazanie informacji o tym który u¿ytkownik jest
+//          zalogowany
+            win->hide();
+            return;
+          } else {
+            //          fl_error("niepoprawne");
+          }
+        } else {
+          //          fl_error("niepoprawne");
+        }
+
       } else if (loginButton == o) {
+        // obecnie 1 bo nie ma jeszcze metody z klasy connection
+        if (1) {
+          // if ((connection.login(userName->value(), password->value()))) {
+          // dodaæ przekazanie informacji o tym który u¿ytkownik jest
+          // zalogowany
+          win->hide();
+          return;
+        } else {
+          //  fl_error("niepoprawne");
+        }
       }
     }
   }
