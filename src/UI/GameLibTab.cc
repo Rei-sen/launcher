@@ -7,59 +7,48 @@
 #include <FL/Fl_Input.H>
 #include <FL/Fl_Output.H>
 #include <FL/Fl_Table.H>
+#include <FL/Fl_message.H>
 
 
-void GameLibTab::updateDlcAndNameMet() {
-  // dodać załadowanie opisu do pola description oraz załadowanie listy dlc dla
-  // wybranej gry, dodatkowo ustawić nazwę gry na wybrane pole z listy
-  // produktów
-  printf("wybor");
-
-  // potem dać sprawdzenie stanu gry - czy jest zainstalowana i odpowiednio aktywować przyciski
-
-  playButton->activate();
-  uninnstallButton->activate();
-  innstallButton->activate();
-  gameName->value(searchInput->value());
+void GameLibTab::onPlayButton(Fl_Widget *, void *v) {
+  fl_message("Game launched");
 }
 
-
-void GameLibTab::searchButtonMet() {
-  // dodać wyszukanie gier i dlc w bazie danych 
+void GameLibTab::onInstallButton(Fl_Widget *, void *v) {
+  fl_message("Game installed");
+  // dodać gdzieś info o tym, że użytkownik ma zainstalowaną grę
+}
+void GameLibTab::onUninstallButton(Fl_Widget *, void *v) {
+  fl_message("Game uninstalled");
+  // dodać gdzieś info o tym, że użytkownik odinstalował grę
+}
+void GameLibTab::onSearchButton(Fl_Widget *, void *v) {
+  // dodać wyszukanie gier i dlc w bazie danych
+    // to poniżej jest po to, żeby sprawdzić czy działa callback
   printf("search");
-  gameName->value(searchInput->value());
+  ((GameLibTab *)v)->gameName->value(((GameLibTab *)v)->searchInput->value());
+  ((GameLibTab *)v)->playButton->activate();
+  ((GameLibTab *)v)->innstallButton->activate();
+  ((GameLibTab *)v)->uninnstallButton->activate();
 }
 
-void GameLibTab::playButtonMet() {
-// dodać komunikat imitujący poprawne uruchomienie gry
-  printf("play");
-
-}
-
-
-void GameLibTab::instalButtonMet() {
-  // dodać komunikat o instalowaniu gry, uaktywnić przycisk do gry i odinstalowania
-  printf("instal");
-}
-
-
-void GameLibTab::uninstallButtonMet() {
-  // dodać komunikat o odinstalowaniu gry, deaktywować przycisk do gry
-  printf("uninstall");
-//  buyButton->activate();
+void GameLibTab::onBrowserClick(Fl_Widget *, void *v) { 
+    // to poniżej jest po to, żeby sprawdzić czy działa callback
+    printf("lista");
+    // dodać pobranie listy dlc dla wybranego elementu oraz przepisanie nazwy do gameName
 }
 
 
 GameLibTab::GameLibTab(State &s) : Tab("Game library", s) {
 
     gameList = new Fl_Browser(10, 75, 221, 370); 
-    gameList->callback(updateDlcAndNameCallback, this);
+    gameList->callback(onBrowserClick, this);
 
     searchInput = new Fl_Input(10, 35, 139, 30);
     searchInput->align(Fl_Align(FL_ALIGN_CENTER));
                                               
     searchButton = new Fl_Button(159, 35, 72, 30, "search"); 
-    searchButton->callback(searchButtonCallback, this);
+    searchButton->callback(onSearchButton, this);
 
 
     Fl_Group *o = new Fl_Group(241, 35, 374, 410);
@@ -68,16 +57,16 @@ GameLibTab::GameLibTab(State &s) : Tab("Game library", s) {
     
     playButton = new Fl_Button(533, 85, 72, 30, "Play");
     playButton->deactivate();
-    playButton->callback(playButtonCallback, this);
+    playButton->callback(onPlayButton, this);
 
     innstallButton = new Fl_Button(451, 85, 72, 30, "Install");
-    innstallButton->callback(instalButtonCallback, this);
+    innstallButton->callback(onInstallButton, this);
 
     innstallButton->deactivate();
       
 
     uninnstallButton = new Fl_Button(369, 85, 72, 30, "Uninstall");
-    uninnstallButton->callback(uninstalButtonCallback, this);
+    uninnstallButton->callback(onUninstallButton, this);
     uninnstallButton->deactivate();
      
     
