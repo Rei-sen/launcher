@@ -3,7 +3,9 @@
 #pragma once
 
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Browser.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Button.H>
 
 #include "UI/Tab.hh"
 
@@ -15,8 +17,36 @@ public:
 
   StoreTab(State &s);
 
+  void searchButtonMet();
+  void buyButtonMet();
+  void updateDlcAndNameMet();
+  void updateNameFiedlMet();
+
+  static void searchButtonCallback(Fl_Widget *, void *v) {
+      ((StoreTab *)v)->searchButtonMet();
+  }
+
+
+  static void buyButtonCallback(Fl_Widget *, void *v) {
+    ((StoreTab *)v)->buyButtonMet();
+  }
+
+  static void updateDlcAndNameCallback(Fl_Widget *, void *v) {
+    ((StoreTab *)v)->updateDlcAndNameMet();
+  }
+
+  static void updateNameFiedlCallback(Fl_Widget *, void *v) {
+    ((StoreTab *)v)->updateNameFiedlMet();
+  }
+
 private:
   Fl_Output *priceLabel;
   Fl_Output *statusLabel;
   Fl_Text_Display *description;
+  Fl_Input *searchInput;
+  Fl_Browser *gameList;
+  Fl_Browser *dlcList;
+  Fl_Output *gameName;
+  Fl_Button *buyButton;
+  Fl_Button *searchButton;
 };
