@@ -15,11 +15,8 @@ public:
   SettingsTab(State &s);
 
 
-  void updateButtonMet();
 
-  static void updateButtonCallback(Fl_Widget *, void *v) {
-    ((SettingsTab *)v)->updateButtonMet();
-  }
+  static void onUpdateButton(Fl_Widget *, void *v);
 
 private:
   Fl_Input *newNameField;
