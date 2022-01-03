@@ -7,6 +7,7 @@
 #include <FL/Fl_Box.H>
 #include <FL/Fl_Window.H>
 
+#include "MockConnection.hh"
 #include "UI/LoginForm.hh"
 #include "UI/MainWindow.hh"
 
@@ -40,7 +41,7 @@ int main(int argc, char **argv) {
   sqlite3_close(db);
 
   /* oczywiście to co wyżej do usunięcia a to co niżej do poprawy */
-  Connection c;
+  MockConnection c;
   LoginForm f(c);
   f.show();
 
