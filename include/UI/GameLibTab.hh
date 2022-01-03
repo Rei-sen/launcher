@@ -16,34 +16,11 @@ public:
   virtual ~GameLibTab() = default;
 
   GameLibTab(State &s);
-  void searchButtonMet();
-
-  void playButtonMet();
-  void updateDlcAndNameMet();
-
-  static void playButtonCallback(Fl_Widget *, void *v) {
-    ((GameLibTab *)v)->playButtonMet();
-  }
-
-    void instalButtonMet();
-
-  static void instalButtonCallback(Fl_Widget *, void *v) {
-      ((GameLibTab *)v)->instalButtonMet();
-  }
-
-    void uninstallButtonMet();
-
-  static void uninstalButtonCallback(Fl_Widget *, void *v) {
-      ((GameLibTab *)v)->uninstallButtonMet();
-  }
-
-    static void searchButtonCallback(Fl_Widget *, void *v) {
-    ((GameLibTab *)v)->searchButtonMet();
-  }
-
-      static void updateDlcAndNameCallback(Fl_Widget *, void *v) {
-    ((GameLibTab *)v)->updateDlcAndNameMet();
-  }
+  static void onPlayButton(Fl_Widget *, void *v);
+  static void onInstallButton(Fl_Widget *, void *v);
+  static void onUninstallButton(Fl_Widget *, void *v);
+  static void onSearchButton(Fl_Widget *, void *v);
+  static void onBrowserClick(Fl_Widget *, void *v);
 
 private:
   Fl_Input *searchInput;
