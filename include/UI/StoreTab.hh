@@ -17,27 +17,13 @@ public:
 
   StoreTab(State &s);
 
-  void searchButtonMet();
-  void buyButtonMet();
-  void updateDlcAndNameMet();
-  void updateNameFiedlMet();
+  static void onSearchButton(Fl_Widget *, void *v);
 
-  static void searchButtonCallback(Fl_Widget *, void *v) {
-      ((StoreTab *)v)->searchButtonMet();
-  }
+  static void onBuyButton(Fl_Widget *, void *v);
 
+  static void onBrowserClick(Fl_Widget *, void *v);
 
-  static void buyButtonCallback(Fl_Widget *, void *v) {
-    ((StoreTab *)v)->buyButtonMet();
-  }
-
-  static void updateDlcAndNameCallback(Fl_Widget *, void *v) {
-    ((StoreTab *)v)->updateDlcAndNameMet();
-  }
-
-  static void updateNameFiedlCallback(Fl_Widget *, void *v) {
-    ((StoreTab *)v)->updateNameFiedlMet();
-  }
+  static void onDlcBrowserClick(Fl_Widget *, void *v);
 
 private:
   Fl_Output *priceLabel;
