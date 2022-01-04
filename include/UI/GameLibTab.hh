@@ -30,9 +30,9 @@ private:
   Fl_Output *gameName;
 
   Fl_Button *playButton;
-  Fl_Button *uninnstallButton;
-  Fl_Button *innstallButton;
-  Fl_Table *dlcTab;
+  Fl_Button *uninstallButton;
+  Fl_Button *installButton;
+  Fl_Table *dlcTable;
 
   Fl_Button *searchButton;
 };
