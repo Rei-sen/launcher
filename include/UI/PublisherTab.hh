@@ -24,22 +24,19 @@ public:
   static void onAddSocialButton(Fl_Widget *, void *v);
   static void onUpdateSocialButton(Fl_Widget *, void *v);
 
-  private:
-  Fl_Browser *gamebrowser;//idk jak to ma działać 
-  Fl_Input *gamename;
+private:
+  Fl_Browser *gameBrowser; // idk jak to ma działać
+  Fl_Input *gameName;
   Fl_Float_Input *price;
   Fl_Text_Editor *description;
-  Fl_Button *updategame;
-  //group of news
-  Fl_Input *newstitle;
-  Fl_Text_Editor *newscontent;
-  Fl_Button *newsupdateadd;
-  //socials
-  Fl_Input *socialsaddress;
+  Fl_Button *updateGame;
+  // group of news
+  Fl_Input *newsTitle;
+  Fl_Text_Editor *newsContent;
+  Fl_Button *newsUpdateAdd;
+  // socials
+  Fl_Input *socialsAddress;
   Fl_Button *socialsUpdate;
   Fl_Choice *socialsPlatform;
   Fl_Button *socialsAddNew;
-
-
-
 };
