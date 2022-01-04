@@ -1,17 +1,16 @@
 ﻿
 #pragma once
 
-#include <UI/Tab.hh>
-#include <FL/Fl_Output.H>
 #include <FL/Fl_Browser.H>
-#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Button.H>
-#include <FL/Fl_Table.H>
-#include <FL/Fl_Text_Editor.H>
-#include <FL/Fl_Input.H>
-#include <FL/Fl_Float_Input.H>
 #include <FL/Fl_Choice.H>
-#include <FL/Fl_Browser.H>
+#include <FL/Fl_Float_Input.H>
+#include <FL/Fl_Input.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Table.H>
+#include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Text_Editor.H>
+#include <UI/Tab.hh>
 
 class PublisherTab : public Tab {
 public:

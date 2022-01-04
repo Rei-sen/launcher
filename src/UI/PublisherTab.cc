@@ -81,9 +81,10 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       {
         socialsPlatform = new Fl_Choice(84, 478, 120, 30, "Platform");
         socialsPlatform->down_box(FL_BORDER_BOX);
-      }                                               // Fl_Choice* o
+      } // Fl_Choice* o
       {
-        socialsAddNew = new Fl_Button(514, 478, 75, 30, "Add new");//onUpdateSocialButton
+        socialsAddNew =
+            new Fl_Button(514, 478, 75, 30, "Add new"); // onUpdateSocialButton
         socialsAddNew->callback(onAddSocialButton, this);
       } // Fl_Button* o
       o->end();
