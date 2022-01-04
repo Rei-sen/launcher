@@ -15,20 +15,20 @@ void SettingsTab::onUpdateButton(Fl_Widget*, void* v) {
   std::string newLogin = ((SettingsTab *)v)->newNameField->value();
   std::string newPassword = ((SettingsTab *)v)->newPasswordField->value();
 
-  if (newLogin.length() && newPassword.length()) {
+
+  if (!newLogin.empty() && !newPassword.empty()) {
     if (fl_ask("Do you really want to update data?")) {
       // może dodać do connect metode zwracającej info czy jest użytkownik o
       // danym loginie, bo hasło powinno móc się powtarzać
       if (1) {
-        //        if (connect.updateLogin(data) &&
-        //        connect.updatePassword(data)) {
-        fl_message("Data updated");
+        //if (connection.updateLogin(newLogin, newPassword) 
+        fl_message("succes");
       } else {
-        //          fl_error("niepoprawne");
+        //          fl_error("error");
       }
     }
   } else {
-    //          fl_error("niepoprawne");
+    //          fl_error("error");
   }
 
 }
@@ -36,12 +36,12 @@ void SettingsTab::onUpdateButton(Fl_Widget*, void* v) {
 SettingsTab::SettingsTab(State &s) : Tab("Settings", s) {
 
     newNameField = new Fl_Input(250, 175, 135, 30, "Username");
-    Fl_Button *updateData =
+    Fl_Button *updateButton =
     new Fl_Button(257, 255, 120, 25, "Update");
 
     newPasswordField = new Fl_Input(250, 215, 135, 30, "Password");
     newPasswordField->type(5);    
-    updateData->callback(onUpdateButton, this);
+    updateButton->callback(onUpdateButton, this);
 
     end();
 }
