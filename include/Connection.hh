@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 
 #include <string>
@@ -14,4 +14,6 @@ public:
   virtual bool isConnected() = 0;
   virtual bool login(std::string name, std::string pass) = 0;
   virtual bool registerAccount(std::string name, std::string pass) = 0;
+
+
 };
