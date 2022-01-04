@@ -28,8 +28,8 @@ void GameLibTab::onSearchButton(Fl_Widget *, void *v) {
   printf("search");
   ((GameLibTab *)v)->gameName->value(((GameLibTab *)v)->searchInput->value());
   ((GameLibTab *)v)->playButton->activate();
-  ((GameLibTab *)v)->innstallButton->activate();
-  ((GameLibTab *)v)->uninnstallButton->activate();
+  ((GameLibTab *)v)->installButton->activate();
+  ((GameLibTab *)v)->installButton->activate();
 }
 
 void GameLibTab::onBrowserClick(Fl_Widget *, void *v) { 
@@ -59,18 +59,18 @@ GameLibTab::GameLibTab(State &s) : Tab("Game library", s) {
     playButton->deactivate();
     playButton->callback(onPlayButton, this);
 
-    innstallButton = new Fl_Button(451, 85, 72, 30, "Install");
-    innstallButton->callback(onInstallButton, this);
+    installButton = new Fl_Button(451, 85, 72, 30, "Install");
+    installButton->callback(onInstallButton, this);
 
-    innstallButton->deactivate();
+    installButton->deactivate();
       
 
-    uninnstallButton = new Fl_Button(369, 85, 72, 30, "Uninstall");
-    uninnstallButton->callback(onUninstallButton, this);
-    uninnstallButton->deactivate();
+    uninstallButton = new Fl_Button(369, 85, 72, 30, "Uninstall");
+    uninstallButton->callback(onUninstallButton, this);
+    uninstallButton->deactivate();
      
     
-    dlcTab = new Fl_Table(251, 150, 354, 285, "DLC");
+    dlcTable = new Fl_Table(251, 150, 354, 285, "DLC");
     o->end();
   end();
 }
