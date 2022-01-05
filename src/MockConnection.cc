@@ -1,26 +1,21 @@
 
 #include "MockConnection.hh"
 
+#include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <sstream>
 
-#include <sqlite3.h>
+namespace fs = std::filesystem;
 
-// zamienić potem na unique_ptr
-static sqlite3 *createLocalDatabase();
+const fs::path dbPath = "server/db.sqlt";
+const fs::path sqlInitPath = "server/init.sql";
 
-MockConnection::MockConnection() {
-  // sprawdzić czy istnieje
-  // if (exists) {
-  //
-  //}
-  // else {
-  auto db = createLocalDatabase();
-  sqlite3_close(db); // usunąć potem
-  //}
-}
+static MockConnection::db_ptr createLocalDatabase();
+static MockConnection::db_ptr openLocalDatabase();
+static MockConnection::db_ptr openOrCreateLocalDatabase();
+
+MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 
 bool MockConnection::isConnected() { return true; }
 bool MockConnection::login(std::string name, std::string pass) {
@@ -50,7 +45,7 @@ bool MockConnection::updateSocials(std::string medium, std::string link) {
   return false;
 }
 
-static sqlite3 *createLocalDatabase() {
+MockConnection::db_ptr createLocalDatabase() {
   sqlite3 *db;
   int result = sqlite3_open("server/db.sqlt", &db);
 
@@ -68,5 +63,26 @@ static sqlite3 *createLocalDatabase() {
 
   sqlite3_exec(db, buffer.str().c_str(), nullptr, nullptr, nullptr);
 
-  return db;
+  return MockConnection::db_ptr(db);
+}
+
+static MockConnection::db_ptr openLocalDatabase() {
+  sqlite3 *db;
+  int result = sqlite3_open("server/db.sqlt", &db);
+
+  if (result != SQLITE_OK) {
+    std::cerr << "Cannot open database: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_close(db);
+
+    // throw
+    return nullptr;
+  }
+  return MockConnection::db_ptr(db);
+}
+
+static MockConnection::db_ptr openOrCreateLocalDatabase() {
+  if (fs::exists(dbPath))
+    return openLocalDatabase();
+  else
+    return createLocalDatabase();
 }
