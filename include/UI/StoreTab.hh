@@ -3,7 +3,9 @@
 #pragma once
 
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Browser.H>
 #include <FL/Fl_Text_Display.H>
+#include <FL/Fl_Button.H>
 
 #include "UI/Tab.hh"
 
@@ -15,8 +17,22 @@ public:
 
   StoreTab(State &s);
 
+  static void onSearchButton(Fl_Widget *, void *v);
+
+  static void onBuyButton(Fl_Widget *, void *v);
+
+  static void onBrowserClick(Fl_Widget *, void *v);
+
+  static void onDlcBrowserClick(Fl_Widget *, void *v);
+
 private:
   Fl_Output *priceLabel;
   Fl_Output *statusLabel;
   Fl_Text_Display *description;
+  Fl_Input *searchInput;
+  Fl_Browser *gameList;
+  Fl_Browser *dlcList;
+  Fl_Output *gameName;
+  Fl_Button *buyButton;
+  Fl_Button *searchButton;
 };
