@@ -8,15 +8,8 @@
 
 namespace fs = std::filesystem;
 
-#if defined(WIN32) || defined(_WIN32) ||                                      \
-    defined(__WIN32) && !defined(__CYGWIN__)
-const fs::path dbPath = "../../../server/db.sqlt";
-const fs::path sqlInitPath = "../../../server/init.sql";
-
-#else
 const fs::path dbPath = "server/db.sqlt";
 const fs::path sqlInitPath = "server/init.sql";
-#endif
 
 static MockConnection::db_ptr createLocalDatabase();
 static MockConnection::db_ptr openLocalDatabase();
