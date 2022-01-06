@@ -18,11 +18,32 @@ static MockConnection::db_ptr openOrCreateLocalDatabase();
 MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 
 bool MockConnection::isConnected() { return true; }
+
 bool MockConnection::login(std::string name, std::string pass) {
 
-#warning zaimplementować
+  sqlite3_stmt *stmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "select id, name, password "
+                         "from users "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+
+  sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) != SQLITE_ROW) {
+    sqlite3_finalize(stmt);
+    return false;
+  }
+
+  if (pass != reinterpret_cast<const char *>(sqlite3_column_text(stmt, 2)))
+    return false;
+
+  userID = sqlite3_column_int64(stmt, 0);
   return true;
 }
+
 std::optional<std::string> MockConnection::registerAccount(std::string name,
                                                            std::string pass) {
   if (name.empty() || pass.empty())

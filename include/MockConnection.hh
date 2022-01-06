@@ -3,8 +3,10 @@
 
 #include <memory>
 
-#include "Connection.hh"
 #include <sqlite3.h>
+
+#include "Connection.hh"
+#include "UserInfo.hh"
 
 class MockConnection : public Connection {
 public:
@@ -36,4 +38,5 @@ public:
 
 private:
   db_ptr db = nullptr;
+  std::optional<UserInfo::ID> userID;
 };

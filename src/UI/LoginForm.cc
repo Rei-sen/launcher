@@ -27,7 +27,6 @@ void LoginForm::show() {
     while ((o = Fl::readqueue())) {
       if (cancelButton == o) {
         win->hide();
-        return;
       } else if (registerButton == o) {
 
         auto result = connection.registerAccount(loginInput->value(),
@@ -40,7 +39,6 @@ void LoginForm::show() {
       } else if (loginButton == o) {
         if (connection.login(loginInput->value(), passwordInput->value())) {
           win->hide();
-          return;
         } else {
           fl_alert("Invalid login or password");
         }
