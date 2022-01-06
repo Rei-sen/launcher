@@ -1,88 +1,121 @@
 
-#include "MockConnection.hh"
+#pragma once
 
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include <memory>
+#include <vector>
 
-namespace fs = std::filesystem;
+#include "Connection.hh"
+#include <sqlite3.h>
 
-const fs::path dbPath = "server/db.sqlt";
-const fs::path sqlInitPath = "server/init.sql";
+class MockConnection : public Connection {
+public:
+  MockConnection(const MockConnection &) = delete;
+  MockConnection &operator=(const MockConnection &) = delete;
 
-static MockConnection::db_ptr createLocalDatabase();
-static MockConnection::db_ptr openLocalDatabase();
-static MockConnection::db_ptr openOrCreateLocalDatabase();
+  ~MockConnection() = default;
+  MockConnection();
 
-MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
+  bool isConnected() override;
+  bool login(std::string name, std::string pass) override;
+  bool registerAccount(std::string name, std::string pass) override;
 
-bool MockConnection::isConnected() { return true; }
-bool MockConnection::login(std::string name, std::string pass) {
+  bool updateGame(std::string title, std::string description,
+                  int price); // dodaje też grę jeśli nie ma jej na liście
+  bool
+  updateNews(std::string gametitle, std::string title,
+             std::string content); // dodaje też grę jeśli nie ma jej na liście
+  bool
+  updateSocials(std::string medium,
+                std::string link); // dodaje też grę jeśli nie ma jej na liście
 
-  //#warning zaimplementować
-  return true;
-}
-bool MockConnection::registerAccount(std::string name, std::string pass) {
+  std::vector<std::string> getAllGames() override;
 
-  //#warning zaimplementować
-  return false;
-}
+  std::vector<std::string> getAllDlc() override;
 
-bool MockConnection::updateGame(std::string title, std::string description,
-                                int price) {
-  //#warning zaimplementować
-  return false;
-}
+  bool updatePassword(std::string pass) override; // przetestować jeszcze trzeba
 
-bool MockConnection::updateNews(std::string gametitle, std::string title,
-                                std::string content) {
-  return false;
-}
+  struct DBDeleter {
+    void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }
+  };
 
-bool MockConnection::updateSocials(std::string medium, std::string link) {
-  //#warning zaimplementować
-  return false;
-}
+  using db_ptr = std::unique_ptr<sqlite3, DBDeleter>;
 
-MockConnection::db_ptr createLocalDatabase() {
-  sqlite3 *db;
-  int result = sqlite3_open("server/db.sqlt", &db);
+  int getUserId();
 
-  if (result != SQLITE_OK) {
-    std::cerr << "Cannot open database: " << sqlite3_errmsg(db) << std::endl;
-    sqlite3_close(db);
+private:
+  db_ptr db = nullptr;
+  int userId;
+};
 
-    // throw
-    return nullptr;
-  }
+/*
+gotowe zapytania sql do których można robić metody
+zapytania sql
+////////////////////////////////
+logowanie
+select users.id
+from users
+where users.name = 'user1' and users.password = '123'
+//////////////////////////////////////////////////
+rejestracja
+poprzedozne zapytanie login i sprawdzeniem czy jest jakiś wynik
+insert into users (name, password, publisher)
+values ('aaa', '123', 0)
+////////////////////////////////
+dodawanie gry
+insert into games (name, description, price)
+values ('warhammer', 'fajna gra rts', 21)
+//////////////////////////////////
+wybranie wszystkich gier
+select *
+from games
+///////////////////////////////////
+info o dlc
+select *
+from dlcs
+where gameID = '2'
+////////////////////////////////////
+utworzenie newsa
+problem
+////////////////////////////////////
+info o grze
+select *
+from games
+where games.id = 1
+/////////////////////
+dostań posiadane gry
+Select gameOwnership.gameID
+from gameOwnership
+where gameOwnership.userID = 3
+////////////////////////
+is logged in - no nie wiem jak to zrobić
+///////////////////////////////////////
+posiadane dlc
+select *
+from dlcOwnership
+where dlcOwnership.userID = 3
+////////////////////
+update info o grze
+UPDATE games
+SET description = 'Alfred Schmidt'
+WHERE games.id = 3;
+/////////////////////////////////////
+update login
+UPDATE users
+SET name = 'Alfred'
+WHERE users.id = 3;
+////////////////////////////
+update password
+UPDATE users
+SET password = '123'
+WHERE users.id = 3
+/////////////////////////
+update news
+UPDATE news
+SET content = 'asdwqe asd awd waeqe asdaw'
+WHERE news.id = 1
+*/
 
-  std::ifstream f("server/init.sql");
-  std::stringstream buffer;
-  buffer << f.rdbuf();
 
-  sqlite3_exec(db, buffer.str().c_str(), nullptr, nullptr, nullptr);
 
-  return MockConnection::db_ptr(db);
-}
 
-static MockConnection::db_ptr openLocalDatabase() {
-  sqlite3 *db;
-  int result = sqlite3_open("server/db.sqlt", &db);
 
-  if (result != SQLITE_OK) {
-    std::cerr << "Cannot open database: " << sqlite3_errmsg(db) << std::endl;
-    sqlite3_close(db);
-
-    // throw
-    return nullptr;
-  }
-  return MockConnection::db_ptr(db);
-}
-
-static MockConnection::db_ptr openOrCreateLocalDatabase() {
-  if (fs::exists(dbPath))
-    return openLocalDatabase();
-  else
-    return createLocalDatabase();
-}
