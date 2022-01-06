@@ -1,121 +1,264 @@
 
-#pragma once
+#include "MockConnection.hh"
 
-#include <memory>
-#include <vector>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
 
-#include "Connection.hh"
-#include <sqlite3.h>
+namespace fs = std::filesystem;
 
-class MockConnection : public Connection {
-public:
-  MockConnection(const MockConnection &) = delete;
-  MockConnection &operator=(const MockConnection &) = delete;
+const fs::path dbPath = "server/db.sqlt";
+const fs::path sqlInitPath = "server/init.sql";
 
-  ~MockConnection() = default;
-  MockConnection();
+static MockConnection::db_ptr createLocalDatabase();
+static MockConnection::db_ptr openLocalDatabase();
+static MockConnection::db_ptr openOrCreateLocalDatabase();
 
-  bool isConnected() override;
-  bool login(std::string name, std::string pass) override;
-  bool registerAccount(std::string name, std::string pass) override;
+MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {
+  userId = 0;
+}
 
-  bool updateGame(std::string title, std::string description,
-                  int price); // dodaje też grę jeśli nie ma jej na liście
-  bool
-  updateNews(std::string gametitle, std::string title,
-             std::string content); // dodaje też grę jeśli nie ma jej na liście
-  bool
-  updateSocials(std::string medium,
-                std::string link); // dodaje też grę jeśli nie ma jej na liście
+int MockConnection::getUserId() { return userId; }
 
-  std::vector<std::string> getAllGames() override;
+bool MockConnection::isConnected() { return true; }
 
-  std::vector<std::string> getAllDlc() override;
 
-  bool updatePassword(std::string pass) override; // przetestować jeszcze trzeba
+bool MockConnection::updatePassword(std::string pass) {
+  sqlite3_stmt *myStatement;
+  int statusOfPrep = 0;
 
-  struct DBDeleter {
-    void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }
-  };
+  statusOfPrep = sqlite3_prepare_v2(
+      db.get(),
+      "update password UPDATE users SET password = ? WHERE users.id = ? ",
+      -1, &myStatement, NULL);
+  sqlite3_bind_text(myStatement, 1, pass.c_str(), -1, SQLITE_STATIC);
+//  sqlite3_bind_text(myStatement, 2, pass.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_int(myStatement, 2, userId);
 
-  using db_ptr = std::unique_ptr<sqlite3, DBDeleter>;
+  if (statusOfPrep == SQLITE_OK) {
+    int statusOfStep = sqlite3_step(myStatement);
+    int resoultCount = 0;
+    int id = 0;
 
-  int getUserId();
-
-private:
-  db_ptr db = nullptr;
-  int userId;
-};
-
-/*
-gotowe zapytania sql do których można robić metody
-zapytania sql
-////////////////////////////////
-logowanie
-select users.id
-from users
-where users.name = 'user1' and users.password = '123'
-//////////////////////////////////////////////////
-rejestracja
-poprzedozne zapytanie login i sprawdzeniem czy jest jakiś wynik
-insert into users (name, password, publisher)
-values ('aaa', '123', 0)
-////////////////////////////////
-dodawanie gry
-insert into games (name, description, price)
-values ('warhammer', 'fajna gra rts', 21)
-//////////////////////////////////
-wybranie wszystkich gier
-select *
-from games
-///////////////////////////////////
-info o dlc
-select *
-from dlcs
-where gameID = '2'
-////////////////////////////////////
-utworzenie newsa
-problem
-////////////////////////////////////
-info o grze
-select *
-from games
-where games.id = 1
-/////////////////////
-dostań posiadane gry
-Select gameOwnership.gameID
-from gameOwnership
-where gameOwnership.userID = 3
-////////////////////////
-is logged in - no nie wiem jak to zrobić
-///////////////////////////////////////
-posiadane dlc
-select *
-from dlcOwnership
-where dlcOwnership.userID = 3
-////////////////////
-update info o grze
-UPDATE games
-SET description = 'Alfred Schmidt'
-WHERE games.id = 3;
-/////////////////////////////////////
-update login
-UPDATE users
-SET name = 'Alfred'
-WHERE users.id = 3;
-////////////////////////////
-update password
-UPDATE users
-SET password = '123'
-WHERE users.id = 3
-/////////////////////////
-update news
-UPDATE news
-SET content = 'asdwqe asd awd waeqe asdaw'
-WHERE news.id = 1
-*/
+    sqlite3_finalize(myStatement);
+    return true;
+  } else {
+    std::cout << "Problem creating a prepared statement" << std::endl;
+    return false;
+  }
+  //#warning zaimplementować
+  return false;
 
 
 
+}
+
+std::vector<std::string> MockConnection::getAllGames() {
+  sqlite3_stmt *myStatement;
+  int statusOfPrep = 0;
+  std::vector<std::string> gameNameList;
+
+  statusOfPrep = sqlite3_prepare_v2(
+      db.get(),
+      "select * from games ",
+      -1, &myStatement, NULL);
+
+  if (statusOfPrep == SQLITE_OK) {
+    int statusOfStep = sqlite3_step(myStatement);
+    int id = 0;
+    std::string name, description;
+    double price;
+
+    while (statusOfStep == SQLITE_ROW) {
+      name = (char *)sqlite3_column_text(myStatement, 1);
+      gameNameList.push_back(name);
+      statusOfStep = sqlite3_step(myStatement);
+      std::cout << "game: " << name << "\n";
+
+    }
+    sqlite3_finalize(myStatement);
+    return gameNameList;
+  
+  } else {
+    std::cout << "Problem creating a prepared statement" << std::endl;
+  }
+  // to tu będzie puste aka błąd jest
+  return gameNameList;
+}
+
+std::vector<std::string> MockConnection::getAllDlc() {
+  sqlite3_stmt *myStatement;
+  int statusOfPrep = 0;
+  std::vector<std::string> gameDlcList;
+
+  statusOfPrep = sqlite3_prepare_v2(db.get(), "select * from dlcs ", -1,
+                                    &myStatement, NULL);
+
+  if (statusOfPrep == SQLITE_OK) {
+    int statusOfStep = sqlite3_step(myStatement);
+    int id = 0;
+    std::string name, description;
+    double price;
+
+    while (statusOfStep == SQLITE_ROW) {
+      name = (char *)sqlite3_column_text(myStatement, 2);
+      gameDlcList.push_back(name);
+      statusOfStep = sqlite3_step(myStatement);
+      std::cout << "dlc: " << name << "\n";
+    }
+    sqlite3_finalize(myStatement);
+    return gameDlcList;
 
 
+  } else {
+    std::cout << "Problem creating a prepared statement" << std::endl;
+  }
+  // to tu będzie puste aka błąd jest
+  return gameDlcList;
+}
+
+
+bool MockConnection::login(std::string name, std::string pass) {
+
+  sqlite3_stmt *myStatement;
+  int statusOfPrep = 0;
+
+  statusOfPrep = sqlite3_prepare_v2(
+      db.get(), "select users.id from users where users.name = ? and users.password = ?", -1,
+      &myStatement,
+      NULL);
+  sqlite3_bind_text(myStatement, 1, name.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(myStatement, 2, pass.c_str(), -1, SQLITE_STATIC);
+    
+     if (statusOfPrep == SQLITE_OK) {
+       int statusOfStep = sqlite3_step(myStatement);
+       int resoultCount = 0;
+       int id = 0;
+       while (statusOfStep == SQLITE_ROW) {
+           id = sqlite3_column_int(myStatement, 0);
+          std::cout << "Student Id: " << id << std::endl;
+          statusOfStep = sqlite3_step(myStatement);
+          resoultCount++;
+       }
+        sqlite3_finalize(myStatement);
+        if (resoultCount == 1) {
+            userId = id;
+            return true;
+        }
+  } else {
+          std::cout << "Problem creating a prepared statement" << std::endl;
+  }
+  //#warning zaimplementować
+
+
+
+  return false;
+}
+bool MockConnection::registerAccount(std::string name, std::string pass) {
+  sqlite3_stmt *myStatement;
+  int statusOfPrep = 0;
+
+  statusOfPrep = sqlite3_prepare_v2(
+      db.get(),
+      "select users.id from users where users.name = ? and users.password = ?",
+      -1, &myStatement, NULL);
+  sqlite3_bind_text(myStatement, 1, name.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(myStatement, 2, pass.c_str(), -1, SQLITE_STATIC);
+
+  if (statusOfPrep == SQLITE_OK) {
+    int statusOfStep = sqlite3_step(myStatement);
+    int resoultCount = 0;
+    int id = 0;
+    while (statusOfStep == SQLITE_ROW) {
+      id = sqlite3_column_int(myStatement, 0);
+      std::cout << "Student Id: " << id << std::endl;
+
+      statusOfStep = sqlite3_step(myStatement);
+      resoultCount++;
+    }
+    sqlite3_finalize(myStatement);
+
+    if (resoultCount == 0) {
+      statusOfPrep = sqlite3_prepare_v2(
+          db.get(),
+          "insert into users (name, password, publisher) values(?, ?, 0) ", -1,
+          &myStatement, NULL);
+      sqlite3_bind_text(myStatement, 1, name.c_str(), -1, SQLITE_STATIC);
+      sqlite3_bind_text(myStatement, 2, pass.c_str(), -1, SQLITE_STATIC);
+      if (statusOfPrep == SQLITE_OK) {
+        statusOfStep = sqlite3_step(myStatement);
+        sqlite3_finalize(myStatement);
+
+        login(name,pass);
+        return true;
+      }
+
+
+    } else {
+      std::cout << "Login taken";
+    }
+  } else {
+    std::cout << "Problem creating a prepared statement" << std::endl;
+  }
+  //#warning zaimplementować
+  return false;
+}
+
+bool MockConnection::updateGame(std::string title, std::string description,
+                                int price) {
+  //#warning zaimplementować
+  return false;
+}
+
+bool MockConnection::updateNews(std::string gametitle, std::string title,
+                                std::string content) {
+  return false;
+}
+
+bool MockConnection::updateSocials(std::string medium, std::string link) {
+  //#warning zaimplementować
+  return false;
+}
+
+MockConnection::db_ptr createLocalDatabase() {
+  sqlite3 *db;
+  int result = sqlite3_open("server/db.sqlt", &db);
+
+  if (result != SQLITE_OK) {
+    std::cerr << "Cannot open database: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_close(db);
+
+    // throw
+    return nullptr;
+  }
+
+  std::ifstream f("server/init.sql");
+  std::stringstream buffer;
+  buffer << f.rdbuf();
+
+  sqlite3_exec(db, buffer.str().c_str(), nullptr, nullptr, nullptr);
+
+  return MockConnection::db_ptr(db);
+}
+
+static MockConnection::db_ptr openLocalDatabase() {
+  sqlite3 *db;
+  int result = sqlite3_open("server/db.sqlt", &db);
+
+  if (result != SQLITE_OK) {
+    std::cerr << "Cannot open database: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_close(db);
+
+    // throw
+    return nullptr;
+  }
+  return MockConnection::db_ptr(db);
+}
+
+static MockConnection::db_ptr openOrCreateLocalDatabase() {
+  if (fs::exists(dbPath))
+    return openLocalDatabase();
+  else
+    return createLocalDatabase();
+}
