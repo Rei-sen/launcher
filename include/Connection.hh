@@ -1,6 +1,7 @@
 ﻿
 #pragma once
 
+#include <optional>
 #include <string>
 
 class Connection {
@@ -13,7 +14,7 @@ public:
   virtual ~Connection() = default;
   virtual bool isConnected() = 0;
   virtual bool login(std::string name, std::string pass) = 0;
-  virtual bool registerAccount(std::string name, std::string pass) = 0;
 
-
+  virtual std::optional<std::string> registerAccount(std::string name,
+                                                     std::string pass) = 0;
 };

@@ -16,7 +16,8 @@ public:
 
   bool isConnected() override;
   bool login(std::string name, std::string pass) override;
-  bool registerAccount(std::string name, std::string pass) override;
+  std::optional<std::string> registerAccount(std::string name,
+                                             std::string pass) override;
 
   bool updateGame(std::string title, std::string description,
                   int price); // dodaje też grę jeśli nie ma jej na liście

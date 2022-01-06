@@ -20,7 +20,7 @@ void LoginForm::show() {
   win->end();
   win->show();
 
-  while (true) {
+  while (win->shown()) {
     Fl::wait();
     Fl_Widget *o;
 
@@ -29,12 +29,13 @@ void LoginForm::show() {
         win->hide();
         return;
       } else if (registerButton == o) {
-        if (connection.registerAccount(loginInput->value(),
-                                       passwordInput->value())) {
+
+        auto result = connection.registerAccount(loginInput->value(),
+                                                 passwordInput->value());
+        if (result.has_value())
+          fl_alert("Error: %s", result.value().c_str());
+        else
           fl_message("Success");
-        } else {
-          fl_alert("Error");
-        }
 
       } else if (loginButton == o) {
         if (connection.login(loginInput->value(), passwordInput->value())) {
