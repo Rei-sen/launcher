@@ -4,19 +4,23 @@
 #include <string>
 #include <vector>
 
+#include "GameInfo.hh"
+
 class DLCInfo {
 public:
-  DLCInfo() = delete;
-  DLCInfo(int gameID, int id, std::string title, double price);
+  using ID = int64_t;
 
-  int getGameID();
-  int getID();
-  std::string getTitle();
-  double getPrice();
+  DLCInfo() = delete;
+  DLCInfo(GameInfo::ID gameID, ID id, std::string title, double price);
+
+  GameInfo::ID getGameID() const;
+  ID getID() const;
+  std::string getTitle() const;
+  double getPrice() const;
 
 private:
-  int gameID;
-  int id;
+  GameInfo::ID gameID;
+  ID id;
   std::string title;
   double price;
 };
