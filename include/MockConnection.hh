@@ -11,6 +11,9 @@
 
 
 
+#include "Connection.hh"
+#include "UserInfo.hh"
+
 class MockConnection : public Connection {
 public:
   MockConnection(const MockConnection &) = delete;

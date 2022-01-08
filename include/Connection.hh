@@ -18,6 +18,7 @@ public:
   virtual ~Connection() = default;
   virtual bool isConnected() = 0;
   virtual bool login(std::string name, std::string pass) = 0;
+<<<<<<< HEAD
 
   virtual std::optional<std::string> registerAccount(std::string name,
                                                      std::string pass) = 0;
@@ -34,5 +35,9 @@ public:
   virtual GameInfo getGameInfo(int64_t gameID) = 0;
 
 
+=======
+>>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
 
+  virtual std::optional<std::string> registerAccount(std::string name,
+                                                     std::string pass) = 0;
 };

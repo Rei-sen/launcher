@@ -314,18 +314,30 @@ std::optional<std::string> MockConnection::registerAccount(std::string name,
 
 bool MockConnection::updateGame(std::string title, std::string description,
                                 int price) {
+<<<<<<< HEAD
 //#warning zaimplementować
+=======
+#warning zaimplementować
+>>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
 bool MockConnection::updateNews(std::string gametitle, std::string title,
                                 std::string content) {
+<<<<<<< HEAD
 //#warning zaimplementować
+=======
+#warning zaimplementować
+>>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
 bool MockConnection::updateSocials(std::string medium, std::string link) {
+<<<<<<< HEAD
 //#warning zaimplementować
+=======
+#warning zaimplementować
+>>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
