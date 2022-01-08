@@ -30,7 +30,7 @@ public:
       std::string name, std::string pass) = 0; // przetestować jeszcze trzeba
 
   virtual std::vector<GameInfo> getAllGames() = 0;
-  virtual std::vector<DLCInfo> getAllDlc(int64_t id) = 0;
+  virtual std::vector<DLCInfo> getGamesAllDLCs(int64_t id) = 0;
 
   virtual std::vector<GameInfo> getOwnedGames(int64_t userID) = 0;
   virtual std::vector<DLCInfo> getOwnedDlc(int64_t userID, int64_t gameID) = 0;
@@ -40,10 +40,6 @@ public:
 
 
   virtual bool isLoggedIn() = 0;
-
-
-  virtual std::optional<std::string> registerAccount(std::string name,
-                                                     std::string pass) = 0;
 
   virtual std::unique_ptr<UserInfo> getUserInfo() = 0;
 };
