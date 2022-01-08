@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <sqlite3.h>
 #include <vector>
 
@@ -27,6 +25,7 @@ public:
   std::optional<std::string> registerAccount(std::string name,
                                              std::string pass) override;
 
+  bool isLoggedIn() override;
   bool updateGame(std::string title, std::string description,
                   int price); // dodaje też grę jeśli nie ma jej na liście
   bool
@@ -36,10 +35,14 @@ public:
   updateSocials(std::string medium,
                 std::string link); // dodaje też grę jeśli nie ma jej na liście
 
+  std::unique_ptr<UserInfo> getUserInfo() override;
+
+private:
   struct DBDeleter {
     void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }
   };
 
+public:
   using db_ptr = std::unique_ptr<sqlite3, DBDeleter>;
 
     bool

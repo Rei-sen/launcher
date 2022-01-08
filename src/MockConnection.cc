@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 namespace fs = std::filesystem;
 
@@ -286,6 +287,8 @@ bool MockConnection::login(std::string name, std::string pass) {
   return true;
 }
 
+bool MockConnection::isLoggedIn() { return userID.has_value(); }
+
 std::optional<std::string> MockConnection::registerAccount(std::string name,
                                                            std::string pass) {
   if (name.empty() || pass.empty())
@@ -339,6 +342,55 @@ bool MockConnection::updateSocials(std::string medium, std::string link) {
 #warning zaimplementować
 >>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
+}
+
+std::unique_ptr<UserInfo> MockConnection::getUserInfo() {
+  sqlite3_stmt *isPublisherStmt;
+  sqlite3_stmt *gameOwnershipStmt;
+  sqlite3_stmt *dlcOwnershipStmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "select publisher "
+                         "from users "
+                         "where id = ?;",
+                         -1, &isPublisherStmt, nullptr) ||
+      sqlite3_prepare_v2(db.get(),
+                         "select gameID "
+                         "from gameOwnership "
+                         "where userID = ?;",
+                         -1, &gameOwnershipStmt, nullptr) ||
+      sqlite3_prepare_v2(db.get(),
+                         "select gameID, dlcID "
+                         "from dlcOwnership "
+                         "where userID = ?;",
+                         -1, &dlcOwnershipStmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  sqlite3_bind_int64(isPublisherStmt, 1, userID.value());
+  sqlite3_bind_int64(gameOwnershipStmt, 1, userID.value());
+  sqlite3_bind_int64(dlcOwnershipStmt, 1, userID.value());
+
+  std::vector<GameInfo::ID> ownedGames;
+  while (sqlite3_step(gameOwnershipStmt) == SQLITE_ROW) {
+    ownedGames.push_back(sqlite3_column_int64(gameOwnershipStmt, 0));
+  }
+  sqlite3_finalize(gameOwnershipStmt);
+
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> ownedDLCs;
+  while (sqlite3_step(dlcOwnershipStmt) == SQLITE_ROW) {
+    ownedDLCs.push_back(
+        std::make_pair(sqlite3_column_int64(dlcOwnershipStmt, 0),
+                       sqlite3_column_int64(dlcOwnershipStmt, 1)));
+  }
+  sqlite3_finalize(dlcOwnershipStmt);
+
+  bool isPublisher = sqlite3_column_int(isPublisherStmt, 0);
+  sqlite3_finalize(isPublisherStmt);
+
+#warning "dodac klase PublisherInfo"
+  return std::make_unique<UserInfo>(ownedGames, ownedDLCs);
 }
 
 MockConnection::db_ptr createLocalDatabase() {

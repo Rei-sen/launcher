@@ -15,6 +15,7 @@
 void PublisherTab::onUpdateGameButton(Fl_Widget *, void *v) {
   fl_message("Game Added/Updated");
 }
+
 void PublisherTab::onUpdateNewsButton(Fl_Widget *, void *v) {
   fl_message("News Added/Updated");
 }

@@ -22,11 +22,14 @@ int main(int argc, char **argv) {
   std::filesystem::current_path("../../../");
 #endif
   /* to co niżej do poprawy */
-  MockConnection c;
-  LoginForm f(c);
+  std::unique_ptr<Connection> connection = std::make_unique<MockConnection>();
+  LoginForm f(*connection);
   f.show();
 
-  State state;
+  if (!connection->isLoggedIn())
+    return 0;
+
+  State state(std::move(connection));
 
   MainWindow w(state);
   w.show();
