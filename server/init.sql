@@ -79,3 +79,13 @@ create table 'dlcOwnership' (
 
 insert into 'dlcOwnership' (userID, gameID, dlcID)
 values (3, 2, 1);
+
+drop table if exists 'socialMedias';
+create table 'socialMedias' (
+       'id' integer primary key autoincrement,
+       'name' text not null,
+       'address' text not null
+);
+
+insert into 'socialMedias' (name, address)
+values ('abc', 'abc.def');
