@@ -19,35 +19,33 @@ static MockConnection::db_ptr openOrCreateLocalDatabase();
 MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 
 bool MockConnection::updateLoginInfo(std::string name, std::string pass) {
+  if (name.empty() || pass.empty())
+    return false;
+
   sqlite3_stmt *myStatement;
   int statusOfPrep = 0;
 
-  statusOfPrep = sqlite3_prepare_v2(
-      db.get(),
-      "update password UPDATE users SET user = ? and password = ? WHERE users.id = ? ", -1,
-      &myStatement, NULL);
+  if (sqlite3_prepare_v2(db.get(),
+                         "update password UPDATE users SET user = ? and "
+                         "password = ? WHERE users.id = ? ",
+                         -1, &myStatement, NULL)) {
+    return false;
+  }
+
   sqlite3_bind_text(myStatement, 1, pass.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_text(myStatement, 2, pass.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_int64(myStatement, 3, userID.value());
-  
 
-
-  if (statusOfPrep == SQLITE_OK) {
-    int statusOfStep = sqlite3_step(myStatement);
-    int resoultCount = 0;
-    int id = 0;
-
+  switch (sqlite3_step(myStatement)) {
+  default:
+    return false;
+    break;
+  case SQLITE_DONE:
     sqlite3_finalize(myStatement);
     return true;
-  } else {
-    std::cout << "Problem creating a prepared statement" << std::endl;
-    return false;
   }
-  //#warning zaimplementować
-  return false;
-
-
 }
+
 
 
 std::vector<GameInfo> MockConnection::getAllGames() {
@@ -59,24 +57,13 @@ std::vector<GameInfo> MockConnection::getAllGames() {
 
   if (sqlite3_prepare_v2(db.get(), "select * from games ", -1, &myStatement,
                          NULL) == SQLITE_OK) {
-    int statusOfStep = sqlite3_step(myStatement);
-    int64_t id = 0;
-    std::string name, description;
-    double price;
-
-    while (statusOfStep == SQLITE_ROW) {
-        // pobranie id gry
-        id = sqlite3_column_int64(myStatement, 0);
-        // pobranie wszystkich dlc bazując na id gry
-      dlscList = getAllDlc(id);
-      name = (char *)sqlite3_column_text(myStatement, 1);
-      description = (char *)sqlite3_column_text(myStatement, 2);
-      price = sqlite3_column_double(myStatement, 3);
-
-      // dodanie do wektora wynikowego
-      gamesList.push_back(GameInfo(id, name, description, price, dlscList));
-
-      statusOfStep = sqlite3_step(myStatement);
+    while (sqlite3_step(myStatement) == SQLITE_ROW) {
+      dlscList = getGamesAllDLCs(sqlite3_column_int64(myStatement, 0));
+      gamesList.push_back(GameInfo(sqlite3_column_int64(myStatement, 0),
+                                   (char *)sqlite3_column_text(myStatement, 1),
+                                   (char *)sqlite3_column_text(myStatement, 2),
+                                   sqlite3_column_double(myStatement, 3),
+                                   dlscList));
     }
     sqlite3_finalize(myStatement);
     return gamesList;
@@ -88,29 +75,20 @@ std::vector<GameInfo> MockConnection::getAllGames() {
   return gamesList;
 }
 
-std::vector<DLCInfo> MockConnection::getAllDlc(int64_t id) {
+std::vector<DLCInfo> MockConnection::getGamesAllDLCs(int64_t id) {
   sqlite3_stmt *myStatement;
   int statusOfPrep = 0;
-  std::vector<std::string> gameDlcList;
   std::vector<DLCInfo> dlcsList;
-  statusOfPrep = sqlite3_prepare_v2(db.get(), "select * from dlcs where gameID = ?", -1, &myStatement,
-                         NULL);
-  sqlite3_bind_int64(myStatement, 1, id);
+  statusOfPrep = sqlite3_prepare_v2(
+      db.get(), "select * from dlcs where gameID = ?", -1, &myStatement, NULL);
 
   if (statusOfPrep == SQLITE_OK) {
-
-    int64_t id_dlc = 0;
-
-    std::string title, description;
-    double price;
+    sqlite3_bind_int64(myStatement, 1, id);
 
     while (sqlite3_step(myStatement) == SQLITE_ROW) {
-      id_dlc = sqlite3_column_int64(myStatement, 1);
-      title = (char *)sqlite3_column_text(myStatement, 2);
-      price = sqlite3_column_double(myStatement, 3);  
-      
-      dlcsList.push_back(DLCInfo(id, id_dlc, title, price));
-      gameDlcList.push_back(title);
+      dlcsList.push_back(DLCInfo(id, sqlite3_column_int64(myStatement, 1),
+                                 (char *)sqlite3_column_text(myStatement, 2),
+                                 sqlite3_column_double(myStatement, 3)));
     }
     sqlite3_finalize(myStatement);
     return dlcsList;
@@ -130,29 +108,21 @@ DLCInfo MockConnection::getDLCInfo(int64_t DlcID) {
   statusOfPrep =
       sqlite3_prepare_v2(db.get(), "select * from dlcs where dlcs.id = ?", -1,
                          &myStatement, NULL);
-  sqlite3_bind_int64(myStatement, 1, DlcID);
 
   if (statusOfPrep == SQLITE_OK) {
-    int64_t id_dlc = 0;
-    int64_t id_game = 0;
-
-    std::string title, description;
-    double price;
-
+    sqlite3_bind_int64(myStatement, 1, DlcID);
     if (sqlite3_step(myStatement)) {
-      id_game = sqlite3_column_int64(myStatement, 0);
-      id_dlc = sqlite3_column_int64(myStatement, 1);
-      title = (char *)sqlite3_column_text(myStatement, 2);
-      price = sqlite3_column_double(myStatement, 3);
-
+      int64_t gameID = sqlite3_column_int64(myStatement, 0);
+      int64_t id_dlc = sqlite3_column_int64(myStatement, 1);
+      std::string title = (char *)sqlite3_column_text(myStatement, 2);
+      double price = sqlite3_column_double(myStatement, 3);
       sqlite3_finalize(myStatement);
-      return DLCInfo(id_game, id_dlc, title, price);
+      return DLCInfo(gameID, id_dlc, title, price);
     }
   } else {
     std::cout << "Problem creating a prepared statement" << std::endl;
   }
   return DLCInfo(0, 0, "error", 0);
-  //    return gamesList;
 }
 
 std::vector<DLCInfo> MockConnection::getOwnedDlc(int64_t userID,
@@ -160,19 +130,18 @@ std::vector<DLCInfo> MockConnection::getOwnedDlc(int64_t userID,
   sqlite3_stmt *myStatement;
   int statusOfPrep = 0;
   std::vector<DLCInfo> dlcsList;
-  statusOfPrep = sqlite3_prepare_v2(
-      db.get(), "select * from dlcOwnership where userID = ? and gameID = ?",
-      -1, &myStatement, NULL);
-  sqlite3_bind_int64(myStatement, 1, userID);
-  sqlite3_bind_int64(myStatement, 2, gameID);
+  statusOfPrep =
+      sqlite3_prepare_v2(db.get(),
+                         "select dlcOwnership.dlcID from dlcOwnership where "
+                         "userID = ? and gameID = ?",
+                         -1, &myStatement, NULL);
 
   if (statusOfPrep == SQLITE_OK) {
-
-    int64_t DlcID = 0;
+    sqlite3_bind_int64(myStatement, 1, userID);
+    sqlite3_bind_int64(myStatement, 2, gameID);
 
     while (sqlite3_step(myStatement) == SQLITE_ROW) {
-      DlcID = sqlite3_column_int64(myStatement, 2);
-      dlcsList.push_back(getDLCInfo(DlcID));
+      dlcsList.push_back(getDLCInfo(sqlite3_column_int64(myStatement, 0)));
     }
     sqlite3_finalize(myStatement);
     return dlcsList;
@@ -191,23 +160,15 @@ GameInfo MockConnection::getGameInfo(int64_t gameID) {
   int statusOfPrep = 0;
   std::vector<DLCInfo> temp;
 
-  statusOfPrep =
-      sqlite3_prepare_v2(db.get(), "select * from games where games.id = ?",
-                         -1, &myStatement, NULL);
-  sqlite3_bind_int64(myStatement, 1, gameID);
+  if (sqlite3_prepare_v2(db.get(), "select * from games where games.id = ?",
+                         -1, &myStatement, NULL) == SQLITE_OK) {
 
-  if (statusOfPrep == SQLITE_OK) {
-    int64_t id_dlc = 0;
-    int64_t id_game = 0;
-
-    std::string name, description;
-    double price;
-
+    sqlite3_bind_int64(myStatement, 1, gameID);
     if (sqlite3_step(myStatement)) {
-      id_game = sqlite3_column_int64(myStatement, 0);
-      name = (char *)sqlite3_column_text(myStatement, 1);
-      description = (char *)sqlite3_column_text(myStatement, 2);
-      price = sqlite3_column_double(myStatement, 3);
+      int64_t id_game = sqlite3_column_int64(myStatement, 0);
+      std::string name = (char *)sqlite3_column_text(myStatement, 1);
+      std::string description = (char *)sqlite3_column_text(myStatement, 2);
+      double price = sqlite3_column_double(myStatement, 3);
 
       sqlite3_finalize(myStatement);
       return GameInfo(id_game, name, description, price, temp);
@@ -226,24 +187,23 @@ std::vector<GameInfo> MockConnection::getOwnedGames(int64_t userID) {
   std::vector<GameInfo> gamesList;
   std::vector<DLCInfo> dlscList;
 
-  statusOfPrep = sqlite3_prepare_v2(
-      db.get(), "select * from gameOwnership where gameOwnership.userID = ? ",
-      -1, &myStatement, NULL);
-  sqlite3_bind_int64(myStatement, 1, userID);
-
+  statusOfPrep =
+      sqlite3_prepare_v2(db.get(),
+                         "select gameOwnership.gameID from gameOwnership "
+                         "where gameOwnership.userID = ? ",
+                         -1, &myStatement, NULL);
 
   if (statusOfPrep == SQLITE_OK) {
-    int64_t gameID = 0;
-    std::string name, description;
+    sqlite3_bind_int64(myStatement, 1, userID);
     double price;
 
     while (sqlite3_step(myStatement) == SQLITE_ROW) {
-      gameID = sqlite3_column_int64(myStatement, 1);
-      GameInfo temp = getGameInfo(gameID);
-      dlscList = getOwnedDlc(userID, gameID);
+      GameInfo temp = getGameInfo(sqlite3_column_int64(myStatement, 0));
+      dlscList = getOwnedDlc(userID, sqlite3_column_int64(myStatement, 0));
 
-      gamesList.push_back(
-          GameInfo(temp.getID(), temp.getTitle(), temp.getDescription(), temp.getPrice(), dlscList));
+      gamesList.push_back(GameInfo(temp.getID(), temp.getTitle(),
+                                   temp.getDescription(), temp.getPrice(),
+                                   dlscList));
     }
     sqlite3_finalize(myStatement);
     return gamesList;
@@ -254,8 +214,6 @@ std::vector<GameInfo> MockConnection::getOwnedGames(int64_t userID) {
 
   // to tu będzie puste aka błąd jest
   return gamesList;
-
-
 }
 
 
@@ -317,30 +275,18 @@ std::optional<std::string> MockConnection::registerAccount(std::string name,
 
 bool MockConnection::updateGame(std::string title, std::string description,
                                 int price) {
-<<<<<<< HEAD
 //#warning zaimplementować
-=======
-#warning zaimplementować
->>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
 bool MockConnection::updateNews(std::string gametitle, std::string title,
                                 std::string content) {
-<<<<<<< HEAD
 //#warning zaimplementować
-=======
-#warning zaimplementować
->>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
 bool MockConnection::updateSocials(std::string medium, std::string link) {
-<<<<<<< HEAD
 //#warning zaimplementować
-=======
-#warning zaimplementować
->>>>>>> 8ea2ec3e53f493e9c2ff13513af4d4845527ea6c
   return false;
 }
 
@@ -389,7 +335,7 @@ std::unique_ptr<UserInfo> MockConnection::getUserInfo() {
   bool isPublisher = sqlite3_column_int(isPublisherStmt, 0);
   sqlite3_finalize(isPublisherStmt);
 
-#warning "dodac klase PublisherInfo"
+//#warning "dodac klase PublisherInfo"
   return std::make_unique<UserInfo>(ownedGames, ownedDLCs);
 }
 
