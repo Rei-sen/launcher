@@ -51,7 +51,7 @@ public:
       override; // przetestować jeszcze trzeba
   std::vector<GameInfo> getAllGames() override;
 
-  std::vector<DLCInfo> getAllDlc(int64_t id) override;
+  std::vector<DLCInfo> getGamesAllDLCs(int64_t id) override;
 
   std::vector<GameInfo> getOwnedGames(int64_t userID) override;
   std::vector<DLCInfo> getOwnedDlc(int64_t userID, int64_t gameID) override;
