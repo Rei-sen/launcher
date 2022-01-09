@@ -19,10 +19,11 @@ public:
   virtual ~PublisherTab() = default;
 
   PublisherTab(State &s);
-  static void onUpdateGameButton(Fl_Widget *, void *v);
-  static void onUpdateNewsButton(Fl_Widget *, void *v);
-  static void onAddSocialButton(Fl_Widget *, void *v);
-  static void onUpdateSocialButton(Fl_Widget *, void *v);
+   void onUpdateGameButton(Fl_Widget *, void *v);
+   void onUpdateNewsButton(Fl_Widget *, void *v);
+   void onAddSocialButton(Fl_Widget *, void *v);
+   void onUpdateSocialButton(Fl_Widget *, void *v);
+  static State *state;
 
 private:
   Fl_Browser *gameBrowser; // idk jak to ma działać

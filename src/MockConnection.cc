@@ -59,6 +59,7 @@ std::optional<std::string> MockConnection::registerAccount(std::string name,
                          -1, &stmt, nullptr)) {
     return "Could not prepare sql statement";
   }
+
   sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
   sqlite3_bind_text(stmt, 2, pass.c_str(), -1, SQLITE_STATIC);
 
@@ -75,18 +76,113 @@ std::optional<std::string> MockConnection::registerAccount(std::string name,
 
 bool MockConnection::updateGame(std::string title, std::string description,
                                 int price) {
-#warning zaimplementować
+//#warning zaimplementować
   return false;
 }
 
-bool MockConnection::updateNews(std::string gametitle, std::string title,
+bool MockConnection::updateNews(std::string gamename, std::string title,
                                 std::string content) {
-#warning zaimplementować
+//#warning zaimplementować
+  sqlite3_stmt *stmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "select id "
+                         "from games "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+  sqlite3_bind_text(stmt, 1, gamename.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) != SQLITE_ROW) {
+    sqlite3_finalize(stmt);
+    return false;
+  }
+  long id = sqlite3_column_int64(stmt, 0);
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "select id "
+                         "from games "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+
   return false;
 }
 
 bool MockConnection::updateSocials(std::string medium, std::string link) {
-#warning zaimplementować
+//#warning zaimplementować
+  sqlite3_stmt *stmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "select name, adress "
+                         "from socialMedias "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+  sqlite3_bind_text(stmt, 1, medium.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) != SQLITE_ROW) {
+    sqlite3_finalize(stmt);
+    return false;
+  }
+  sqlite3_stmt *stmt2;
+  if (sqlite3_prepare_v2(db.get(),
+                         "update socialMedias "
+                         "set adress = ? "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+  sqlite3_bind_text(stmt, 1, link.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, medium.c_str(), -1, SQLITE_STATIC);
+
+  switch (sqlite3_step(stmt)) {
+  default:
+    return false;
+  case SQLITE_DONE:
+    sqlite3_finalize(stmt);
+    return true;
+  }
+
+  return false;
+}
+
+bool MockConnection::addSocials(std::string medium, std::string link) {
+  //#warning zaimplementować
+  sqlite3_stmt *stmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "select name,  "
+                         "from socialMedias "
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+  sqlite3_bind_text(stmt, 1, medium.c_str(), -1, SQLITE_STATIC);
+
+  if (sqlite3_step(stmt) == SQLITE_ROW) {//tutaj kod który sprawia że funkcja nic nie zmienia jeśli social medium już istnieje
+    sqlite3_finalize(stmt);
+  } else
+    return false;
+
+  sqlite3_stmt *stmt2;
+  if (sqlite3_prepare_v2(db.get(),
+                         "insert into socialMedias "
+                         "(name, address)values(?,?);",
+                         -1, &stmt, nullptr)) {
+    return false;
+  }
+  sqlite3_bind_text(stmt, 1, medium.c_str(), -1, SQLITE_STATIC);
+  sqlite3_bind_text(stmt, 2, link.c_str(), -1, SQLITE_STATIC);
+
+  switch (sqlite3_step(stmt)) {
+  default:
+    return false;
+  case SQLITE_DONE:
+    sqlite3_finalize(stmt);
+    return true;
+  }
+
   return false;
 }
 
@@ -135,7 +231,7 @@ std::unique_ptr<UserInfo> MockConnection::getUserInfo() {
   bool isPublisher = sqlite3_column_int(isPublisherStmt, 0);
   sqlite3_finalize(isPublisherStmt);
 
-#warning "dodac klase PublisherInfo"
+//#warning "dodac klase PublisherInfo"
   return std::make_unique<UserInfo>(ownedGames, ownedDLCs);
 }
 

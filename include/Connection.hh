@@ -23,4 +23,16 @@ public:
                                                      std::string pass) = 0;
 
   virtual std::unique_ptr<UserInfo> getUserInfo() = 0;
+
+  virtual bool updateGame(std::string title, std::string description,
+             int price) = 0; // dodaje też grę jeśli nie ma jej na liście
+  virtual bool updateNews(
+      std::string gamename, std::string title,
+      std::string content) = 0; // dodaje też grę jeśli nie ma jej na liście
+  virtual bool updateSocials(
+      std::string medium,
+      std::string link) = 0; // dodaje też grę jeśli nie ma jej na liście
+  virtual bool addSocials(
+      std::string medium,
+      std::string link) = 0; // dodaje też grę jeśli nie ma jej na liście
 };

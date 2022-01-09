@@ -11,6 +11,7 @@
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Tree.H>
 #include <FL/fl_ask.H>
+#include <FL/Fl_Choice.H>
 
 void PublisherTab::onUpdateGameButton(Fl_Widget *, void *v) {
   fl_message("Game Added/Updated");
@@ -23,12 +24,14 @@ void PublisherTab::onAddSocialButton(Fl_Widget *, void *v) {
   fl_message("Socials Added");
 }
 void PublisherTab::onUpdateSocialButton(Fl_Widget *, void *v) {
-  fl_message("Socials Updated");
+  //Connection::updateSocials(socialsPlatform.text, socialsAddress.text);
+    state->getConnection();
+    fl_message("Socials Updated");
 }
 
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
-
   {
+    PublisherTab::state = &s;
     Fl_Scroll *o = new Fl_Scroll(0, 25, 625, 430);
     o->type(2);
     {
@@ -46,7 +49,7 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       description = new Fl_Text_Editor(360, 70, 230, 122, "Description");
 
       updateGame = new Fl_Button(278, 172, 72, 20, "Update");
-      updateGame->callback(onUpdateGameButton, this);
+      updateGame->callback(this->&onUpdateGameButton, this);
       o->end();
     } // Fl_Group* o
     {

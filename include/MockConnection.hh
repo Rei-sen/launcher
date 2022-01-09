@@ -21,13 +21,18 @@ public:
 
   bool isLoggedIn() override;
   bool updateGame(std::string title, std::string description,
-                  int price); // dodaje też grę jeśli nie ma jej na liście
-  bool
-  updateNews(std::string gametitle, std::string title,
-             std::string content); // dodaje też grę jeśli nie ma jej na liście
+                  int price) override; // dodaje też grę jeśli nie ma jej na liście
+  bool updateNews(std::string gamename, std::string title,
+                  std::string content)
+      override; // dodaje też grę jeśli nie ma jej na liście
+
+  bool 
+  addSocials(std::string medium,
+      std::string link) override; // dodaje też grę jeśli nie ma jej na liście
+
   bool
   updateSocials(std::string medium,
-                std::string link); // dodaje też grę jeśli nie ma jej na liście
+      std::string link) override; // dodaje też grę jeśli nie ma jej na liście
 
   std::unique_ptr<UserInfo> getUserInfo() override;
 

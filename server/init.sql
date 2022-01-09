@@ -87,5 +87,5 @@ create table 'socialMedias' (
        'address' text not null
 );
 
-insert into 'socialMedias' (name, address)
+insert into 'socialMedias' (name, address) 
 values ('abc', 'abc.def');
