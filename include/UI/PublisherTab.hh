@@ -1,6 +1,7 @@
 ﻿
 #pragma once
 
+#include "FL/Fl_Hold_Browser.H"
 #include <FL/Fl_Browser.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
@@ -19,17 +20,22 @@ public:
   virtual ~PublisherTab() = default;
 
   PublisherTab(State &s);
-  static void onUpdateGameButton(Fl_Widget *, void *v);
-  static void onUpdateNewsButton(Fl_Widget *, void *v);
-  static void onAddSocialButton(Fl_Widget *, void *v);
-  static void onUpdateSocialButton(Fl_Widget *, void *v);
 
 private:
-  Fl_Browser *gameBrowser; // idk jak to ma działać
+  void initAllGroups();
+  void initGameGroup();
+  void updateGameGroup();
+
+  static void onGameBrowserSelected(Fl_Widget *, void *);
+  static void onUpdateGame(Fl_Widget *, void *);
+
+private:
+  Fl_Hold_Browser *gameBrowser;
   Fl_Input *gameName;
-  Fl_Float_Input *price;
-  Fl_Text_Editor *description;
-  Fl_Button *updateGame;
+  Fl_Float_Input *gamePrice;
+  Fl_Text_Editor *gameDescription;
+  Fl_Text_Buffer *gameDescriptionBuf;
+  Fl_Button *updateGameButton;
   // group of news
   Fl_Input *newsTitle;
   Fl_Text_Editor *newsContent;

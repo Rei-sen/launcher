@@ -74,7 +74,7 @@ create table 'dlcOwnership' (
        'dlcID' integer not null,
        foreign key (userID) references users(id),
        foreign key (gameID, dlcID) references dlcs(gameID, id),
-       primary key (userID, gameID)
+       primary key (userID, gameID, dlcID)
 );
 
 insert into 'dlcOwnership' (userID, gameID, dlcID)

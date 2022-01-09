@@ -10,6 +10,7 @@ Connection &State::getConnection() { return *connection; }
 
 void State::update() {
   user = connection->getUserInfo();
-  // dlcs = connection->getAllDLCs();
-  // allGames = connection->getAllGames();
+  allGames = connection->getAllGames();
 }
+
+std::vector<GameInfo> &State::getAllGames() { return allGames; }

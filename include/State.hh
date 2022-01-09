@@ -24,10 +24,11 @@ public:
 
   void update();
 
+  std::vector<GameInfo> &getAllGames();
+
 private:
   std::unique_ptr<Connection> connection;
   std::unique_ptr<UserInfo> user;
 
   std::vector<GameInfo> allGames;
-  std::map<GameInfo::ID, std::map<DLCInfo::ID, DLCInfo>> dlcs;
 };

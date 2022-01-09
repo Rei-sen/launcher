@@ -37,16 +37,3 @@ else()
   target_link_libraries(Launcher dl pthread)
 endif()
 
-# # tests
-# enable_testing()
-
-# set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-
-# add_executable(tests test/test.cpp ${SRC_FILES})
-# target_include_directories(tests PRIVATE ${gtest_SOURCE_DIR}/include
-#                                          ${gtest_SOURCE_DIR})
-# target_include_directories(tests PRIVATE include)
-
-# target_link_libraries(tests gtest gtest_main)
-
-# add_test(run-tests tests)

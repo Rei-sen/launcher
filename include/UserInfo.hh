@@ -15,7 +15,7 @@ public:
   UserInfo(std::vector<GameInfo::ID> ownedGames,
            std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> ownedDLCs);
 
-  bool hasPublisherAccess() const;
+  virtual bool hasPublisherAccess() const;
 
 private:
   std::vector<GameInfo::ID> ownedGames;

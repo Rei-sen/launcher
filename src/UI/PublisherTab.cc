@@ -12,68 +12,54 @@
 #include <FL/Fl_Tree.H>
 #include <FL/fl_ask.H>
 
-void PublisherTab::onUpdateGameButton(Fl_Widget *, void *v) {
-  fl_message("Game Added/Updated");
-}
-
-void PublisherTab::onUpdateNewsButton(Fl_Widget *, void *v) {
-  fl_message("News Added/Updated");
-}
-void PublisherTab::onAddSocialButton(Fl_Widget *, void *v) {
-  fl_message("Socials Added");
-}
-void PublisherTab::onUpdateSocialButton(Fl_Widget *, void *v) {
-  fl_message("Socials Updated");
-}
-
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
   {
     Fl_Scroll *o = new Fl_Scroll(0, 25, 625, 430);
     o->type(2);
     {
-      Fl_Group *o = new Fl_Group(10, 57, 590, 150, "Games");
+      Fl_Group *o = new Fl_Group(10, 65, 590, 135, "Games");
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
 
-      gameBrowser = new Fl_Browser(10, 67, 156, 125);
-      gameBrowser->type(1);
+      gameBrowser = new Fl_Hold_Browser(10, 70, 155, 125);
+      gameBrowser->callback(onGameBrowserSelected, (void *)this);
 
       gameName = new Fl_Input(210, 70, 140, 30, "Name");
 
-      price = new Fl_Float_Input(210, 110, 140, 30, "Price");
-      price->type(1);
+      gamePrice = new Fl_Float_Input(210, 110, 140, 30, "Price");
+      gamePrice->type(1);
 
-      description = new Fl_Text_Editor(360, 70, 230, 122, "Description");
+      gameDescriptionBuf = new Fl_Text_Buffer;
+      gameDescription = new Fl_Text_Editor(360, 70, 230, 122, "Description");
+      gameDescription->buffer(gameDescriptionBuf);
 
-      updateGame = new Fl_Button(278, 172, 72, 20, "Update");
-      updateGame->callback(onUpdateGameButton, this);
+      updateGameButton = new Fl_Button(278, 172, 72, 20, "Update");
+      updateGameButton->callback(onUpdateGame, (void *)this);
       o->end();
     } // Fl_Group* o
     {
-      Fl_Group *o = new Fl_Group(5, 239, 595, 206, "News");
+      Fl_Group *o = new Fl_Group(10, 240, 595, 205, "News");
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       { new Fl_Tree(10, 245, 155, 170); }                       // Fl_Tree* o
       { newsTitle = new Fl_Input(230, 245, 360, 30, "title"); } // Fl_Input* o
       {
         newsUpdateAdd = new Fl_Button(500, 410, 90, 25, "Update/Add");
-        newsUpdateAdd->callback(onUpdateNewsButton, this);
 
       } // Fl_Button* o
       {
-        newsContent = new Fl_Text_Editor(230, 285, 360, 115, "Content");
+        newsContent = new Fl_Text_Editor(230, 290, 360, 110, "Content");
         o->align(Fl_Align(FL_ALIGN_LEFT));
       } // Fl_Text_Editor* o
       o->end();
     } // Fl_Group* o
     {
-      Fl_Group *o = new Fl_Group(10, 472, 589, 46, "Social media");
+      Fl_Group *o = new Fl_Group(10, 470, 590, 46, "Social media");
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       {
         socialsAddress = new Fl_Input(272, 478, 153, 30, "Address");
       } // Fl_Input* o
       {
         socialsUpdate = new Fl_Button(435, 478, 69, 30, "Update");
-        socialsUpdate->callback(onUpdateSocialButton, this);
 
       } // Fl_Button* o
       {
@@ -83,10 +69,73 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       {
         socialsAddNew =
             new Fl_Button(514, 478, 75, 30, "Add new"); // onUpdateSocialButton
-        socialsAddNew->callback(onAddSocialButton, this);
-      } // Fl_Button* o
+      }                                                 // Fl_Button* o
       o->end();
     } // Fl_Group* o
     o->end();
   } // Fl_Scroll* o
+
+  initAllGroups();
+}
+
+void PublisherTab::initAllGroups() { initGameGroup(); }
+
+void PublisherTab::initGameGroup() {
+  gameBrowser->clear();
+  for (auto game : state.getAllGames()) {
+    gameBrowser->add(game.getTitle().c_str(), (void *)this);
+  }
+
+  updateGameGroup();
+}
+
+void PublisherTab::updateGameGroup() {
+  int i = gameBrowser->value();
+  if (i == 0) {
+    gamePrice->clear_active();
+    gamePrice->value("");
+    gameName->clear_active();
+    gameName->value("");
+    gameDescription->clear_active();
+    gameDescriptionBuf->text("");
+    updateGameButton->clear_active();
+  } else {
+    --i;
+    auto selectedGame = state.getAllGames()[i];
+    gamePrice->set_active();
+    gamePrice->value(std::to_string(selectedGame.getPrice()).c_str());
+    gameName->set_active();
+    gameName->value(selectedGame.getTitle().c_str());
+    gameDescription->set_active();
+    gameDescriptionBuf->text(selectedGame.getDescription().c_str());
+    updateGameButton->set_active();
+  }
+
+  redraw();
+}
+
+void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
+  ((PublisherTab *)_this)->updateGameGroup();
+}
+
+void PublisherTab::onUpdateGame(Fl_Widget *, void *_this) {
+  auto tab = (PublisherTab *)_this;
+  auto oldInfo = tab->state.getAllGames()[tab->gameBrowser->value() - 1];
+
+  double newPrice;
+  try {
+    newPrice = std::stod(tab->gamePrice->value());
+  } catch (std::invalid_argument &) {
+    fl_message("invalid number");
+    return;
+  }
+
+  GameInfo newInfo(oldInfo.getID(), tab->gameName->value(),
+                   tab->gameDescriptionBuf->text(), newPrice,
+                   oldInfo.getDLCs());
+
+  tab->state.getConnection().updateGameInfo(newInfo);
+
+  tab->state.update();
+  tab->initAllGroups();
 }

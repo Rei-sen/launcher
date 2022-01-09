@@ -22,5 +22,13 @@ public:
   virtual std::optional<std::string> registerAccount(std::string name,
                                                      std::string pass) = 0;
 
+  virtual std::vector<GameInfo> getAllGames() = 0;
+  // zwraca wszystkie dlc dla danej gry
+  virtual std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) = 0;
+
   virtual std::unique_ptr<UserInfo> getUserInfo() = 0;
+  virtual std::vector<GameInfo::ID> getOwnedGames() = 0;
+  virtual std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs() = 0;
+
+  virtual bool updateGameInfo(GameInfo info) = 0;
 };

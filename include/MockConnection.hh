@@ -16,20 +16,18 @@ public:
 
   bool isConnected() override;
   bool login(std::string name, std::string pass) override;
+  bool isLoggedIn() override;
   std::optional<std::string> registerAccount(std::string name,
                                              std::string pass) override;
 
-  bool isLoggedIn() override;
-  bool updateGame(std::string title, std::string description,
-                  int price); // dodaje też grę jeśli nie ma jej na liście
-  bool
-  updateNews(std::string gametitle, std::string title,
-             std::string content); // dodaje też grę jeśli nie ma jej na liście
-  bool
-  updateSocials(std::string medium,
-                std::string link); // dodaje też grę jeśli nie ma jej na liście
+  std::vector<GameInfo> getAllGames() override;
+  std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) override;
 
   std::unique_ptr<UserInfo> getUserInfo() override;
+  std::vector<GameInfo::ID> getOwnedGames() override;
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs() override;
+
+  bool updateGameInfo(GameInfo info) override;
 
 private:
   struct DBDeleter {
