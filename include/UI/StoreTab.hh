@@ -20,7 +20,7 @@ public:
   static void onSearchButton(Fl_Widget *, void *v);
 
   static void onBuyButton(Fl_Widget *, void *v);
-
+  //
   static void onBrowserClick(Fl_Widget *, void *v);
 
   static void onDlcBrowserClick(Fl_Widget *, void *v);
