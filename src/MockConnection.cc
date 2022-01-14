@@ -146,9 +146,11 @@ std::unique_ptr<UserInfo> MockConnection::getUserInfo() {
   sqlite3_finalize(stmt);
 
   if (isPublisher)
-    return std::make_unique<PublisherInfo>(getOwnedGames(), getOwnedDLCs());
+    return std::make_unique<PublisherInfo>(getOwnedGames(), getOwnedDLCs(),
+                                           userID.value());
   else
-    return std::make_unique<UserInfo>(getOwnedGames(), getOwnedDLCs());
+    return std::make_unique<UserInfo>(getOwnedGames(), getOwnedDLCs(),
+                                      userID.value());
 }
 
 std::vector<GameInfo::ID> MockConnection::getOwnedGames() {
