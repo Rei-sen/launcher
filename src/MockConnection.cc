@@ -23,7 +23,7 @@ MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 bool MockConnection::isConnected() { return true; }
 
 bool MockConnection::login(std::string name, std::string pass) {
-
+    //
   sqlite3_stmt *stmt;
   if (sqlite3_prepare_v2(db.get(),
                          "select id, name, password "
