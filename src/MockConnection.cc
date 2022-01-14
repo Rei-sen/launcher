@@ -114,6 +114,8 @@ std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
         "getAllGamesDLCs(): could not prepare statement"s +
         sqlite3_errmsg(db.get()));
   }
+  
+  sqlite3_bind_int64(stmt, 1, id);
 
   std::vector<DLCInfo> dlcs;
   while (sqlite3_step(stmt) == SQLITE_ROW) {
