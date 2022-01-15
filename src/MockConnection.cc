@@ -23,7 +23,7 @@ MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 bool MockConnection::isConnected() { return true; }
 
 bool MockConnection::login(std::string name, std::string pass) {
-
+    //
   sqlite3_stmt *stmt;
   if (sqlite3_prepare_v2(db.get(),
                          "select id, name, password "
@@ -114,6 +114,8 @@ std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
         "getAllGamesDLCs(): could not prepare statement"s +
         sqlite3_errmsg(db.get()));
   }
+  
+  sqlite3_bind_int64(stmt, 1, id);
 
   std::vector<DLCInfo> dlcs;
   while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -146,9 +148,11 @@ std::unique_ptr<UserInfo> MockConnection::getUserInfo() {
   sqlite3_finalize(stmt);
 
   if (isPublisher)
-    return std::make_unique<PublisherInfo>(getOwnedGames(), getOwnedDLCs());
+    return std::make_unique<PublisherInfo>(getOwnedGames(), getOwnedDLCs(),
+                                           userID.value());
   else
-    return std::make_unique<UserInfo>(getOwnedGames(), getOwnedDLCs());
+    return std::make_unique<UserInfo>(getOwnedGames(), getOwnedDLCs(),
+                                      userID.value());
 }
 
 std::vector<GameInfo::ID> MockConnection::getOwnedGames() {

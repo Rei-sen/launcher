@@ -12,6 +12,8 @@
 #include <FL/Fl_Tree.H>
 #include <FL/fl_ask.H>
 
+#include <stdexcept>
+
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
   {
@@ -123,6 +125,7 @@ void PublisherTab::onUpdateGame(Fl_Widget *, void *_this) {
   auto oldInfo = tab->state.getAllGames()[tab->gameBrowser->value() - 1];
 
   double newPrice;
+
   try {
     newPrice = std::stod(tab->gamePrice->value());
   } catch (std::invalid_argument &) {
