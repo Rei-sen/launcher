@@ -72,7 +72,7 @@ StoreTab::StoreTab(State &s) : Tab("Store", s) {
   dlcList->align(Fl_Align(FL_ALIGN_TOP));
   dlcList->callback(onDlcBrowserClick, this);
   // Fl_Browser* o
-  //
+  ///
   description = new Fl_Text_Display(251, 125, 354, 178);
   // Fl_Text_Display* description
   o->end();
