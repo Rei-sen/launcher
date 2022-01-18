@@ -105,8 +105,8 @@ void PublisherTab::initNewsGroup() {
     auto gamename = std::find_if(games.begin(), games.end(), [&](GameInfo nn) {
       return nn.getID() == n.getGameID();
         });
-    std::string nigger = ("/" + gamename->getTitle() + "/" + n.getTitle());
-    newsTree->add(nigger.c_str());
+    std::string temp = ("/" + gamename->getTitle() + "/" + n.getTitle());
+    newsTree->add(temp.c_str());
   });
   /* for (auto game : games) {
     std::vector<News> gamenews;
