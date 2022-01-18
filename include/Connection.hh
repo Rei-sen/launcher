@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include <memory>
@@ -6,6 +6,7 @@
 #include <string>
 
 #include "UserInfo.hh"
+#include "News.hh"
 
 class Connection {
 public:
@@ -31,4 +32,7 @@ public:
   virtual std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs() = 0;
 
   virtual bool updateGameInfo(GameInfo info) = 0;
+
+  virtual std::vector<News> getAllNews() = 0;
+  //
 };
