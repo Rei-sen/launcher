@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include <sqlite3.h>
@@ -29,6 +29,9 @@ public:
 
   bool updateGameInfo(GameInfo info) override;
 
+  std::vector<News> getAllNews() override;
+
+  //
 private:
   struct DBDeleter {
     void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }
