@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "PublisherInfo.hh"
+#include "News.hh"
 
 namespace fs = std::filesystem;
 
@@ -100,6 +101,35 @@ std::vector<GameInfo> MockConnection::getAllGames() {
 
   return games;
 }
+
+std::vector<News> MockConnection::getAllNews() {
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "select id, id, title, content "
+                         "from news",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("getAllGames(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  std::vector<News> news;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    GameInfo::ID id = sqlite3_column_int64(stmt, 0);
+    News::ID idn = sqlite3_column_int64(stmt, 1);
+
+    // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
+     news.emplace_back(idn, idn,
+                       (char *)sqlite3_column_text(stmt, 2),
+                       (char *)sqlite3_column_text(stmt, 3));
+  }
+
+  sqlite3_finalize(stmt);
+
+  return news;
+}
+
 
 std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
   sqlite3_stmt *stmt;

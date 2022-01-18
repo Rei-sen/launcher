@@ -10,9 +10,11 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Tree.H>
+#include <FL/FL_Tree_Item.H>
 #include <FL/fl_ask.H>
 
 #include <stdexcept>
+#include <algorithm>
 
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
@@ -42,9 +44,11 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
     {
       Fl_Group *o = new Fl_Group(10, 240, 595, 205, "News");
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-      { new Fl_Tree(10, 245, 155, 170); }                       // Fl_Tree* o
+      newsTree =   new Fl_Tree(10, 245, 155, 170);                         // Fl_Tree* o
+      newsTree->root_label("Games");
+      //auto node = newsTree->add("CUCKOLD SIMULATOR: LIFE OF A BETA CUCK");
       { newsTitle = new Fl_Input(230, 245, 360, 30, "title"); } // Fl_Input* o
-      {
+      { 
         newsUpdateAdd = new Fl_Button(500, 410, 90, 25, "Update/Add");
 
       } // Fl_Button* o
@@ -80,7 +84,9 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
   initAllGroups();
 }
 
-void PublisherTab::initAllGroups() { initGameGroup(); }
+void PublisherTab::initAllGroups() { initGameGroup();
+  initNewsGroup();
+}
 
 void PublisherTab::initGameGroup() {
   gameBrowser->clear();
@@ -89,6 +95,35 @@ void PublisherTab::initGameGroup() {
   }
 
   updateGameGroup();
+}
+
+void PublisherTab::initNewsGroup() {
+  auto news = state.getAllNews();
+  auto games = state.getAllGames();
+
+  std::for_each(news.begin(), news.end(), [&](News n) {
+    auto gamename = std::find_if(games.begin(), games.end(), [&](GameInfo nn) {
+      return nn.getID() == n.getGameID();
+        });
+    std::string nigger = ("/" + gamename->getTitle() + "/" + n.getTitle());
+    newsTree->add(nigger.c_str());
+  });
+  /* for (auto game : games) {
+    std::vector<News> gamenews;
+     GameInfo::ID id = game.getID();
+    std::for_each(news.begin(), news.end(), [](News n) { if (n.getGameID()==game.ge)
+        }
+    )
+    while (newss != news.end()) {
+      dostuff();
+        newsTree->add();
+
+
+        }
+    }
+    */
+  //updateGameGroup();
+
 }
 
 void PublisherTab::updateGameGroup() {
@@ -115,6 +150,8 @@ void PublisherTab::updateGameGroup() {
 
   redraw();
 }
+
+
 
 void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateGameGroup();

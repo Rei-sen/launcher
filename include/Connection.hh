@@ -6,6 +6,7 @@
 #include <string>
 
 #include "UserInfo.hh"
+#include "News.hh"
 
 class Connection {
 public:
@@ -23,6 +24,7 @@ public:
                                                      std::string pass) = 0;
 
   virtual std::vector<GameInfo> getAllGames() = 0;
+  virtual std::vector<News> getAllNews() = 0;
   // zwraca wszystkie dlc dla danej gry
   virtual std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) = 0;
 

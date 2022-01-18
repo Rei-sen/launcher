@@ -10,6 +10,7 @@
 #include "DLCInfo.hh"
 #include "GameInfo.hh"
 #include "UserInfo.hh"
+#include "News.hh"
 
 class State {
 public:
@@ -25,10 +26,12 @@ public:
   void update();
 
   std::vector<GameInfo> &getAllGames();
+  std::vector<News> &getAllNews();
 
 private:
   std::unique_ptr<Connection> connection;
   std::unique_ptr<UserInfo> user;
 
   std::vector<GameInfo> allGames;
+  std::vector<News> allNews;
 };
