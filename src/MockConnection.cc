@@ -205,6 +205,34 @@ MockConnection::getOwnedDLCs() {
   return ownedDLCs;
 }
 
+//
+std::vector<News> MockConnection::getAllNews() {
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "SELECT gameID, id, title, content "
+                         "FROM news",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("getAllNews(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  std::vector<News> news;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    GameInfo::ID id = sqlite3_column_int64(stmt, 0);
+    // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
+    news.emplace_back(id, sqlite3_column_int64(stmt, 1),
+                       (char *)sqlite3_column_text(stmt, 2),
+                      (char *)sqlite3_column_text(stmt, 3));
+  }
+
+  sqlite3_finalize(stmt);
+
+  return news;
+}
+
+
 bool MockConnection::updateGameInfo(GameInfo info) {
   sqlite3_stmt *stmt;
 
