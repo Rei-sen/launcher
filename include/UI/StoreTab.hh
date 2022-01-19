@@ -2,10 +2,11 @@
 
 #pragma once
 
-#include <FL/Fl_Output.H>
 #include <FL/Fl_Browser.H>
-#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Hold_Browser.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Text_Display.H>
 
 #include "UI/Tab.hh"
 
@@ -26,12 +27,21 @@ public:
   static void onDlcBrowserClick(Fl_Widget *, void *v);
 
 private:
+  std::vector<GameInfo> gamesVect;
+
+  void userSearch(std::string value);
+  void initGamesList();
+  void updateGamesList();
+  void updateGameDLCsList(int gameID);
+  void loadDLCData(int gameID, int dlcID);
+
   Fl_Output *priceLabel;
   Fl_Output *statusLabel;
   Fl_Text_Display *description;
+  Fl_Text_Buffer *descriptionBuf;
   Fl_Input *searchInput;
-  Fl_Browser *gameList;
-  Fl_Browser *dlcList;
+  Fl_Hold_Browser *gameList;
+  Fl_Hold_Browser *dlcList;
   Fl_Output *gameName;
   Fl_Button *buyButton;
   Fl_Button *searchButton;
