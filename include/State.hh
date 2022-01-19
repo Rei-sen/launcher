@@ -25,6 +25,7 @@ public:
   void update();
 
   std::vector<GameInfo> &getAllGames();
+  UserInfo &getUser();
 
 private:
   std::unique_ptr<Connection> connection;

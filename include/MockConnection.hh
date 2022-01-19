@@ -28,6 +28,7 @@ public:
   std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs() override;
 
   bool updateGameInfo(GameInfo info) override;
+  std::optional<std::string> buyGame(GameInfo::ID id) override;
 
 private:
   struct DBDeleter {

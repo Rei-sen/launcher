@@ -23,7 +23,7 @@ MockConnection::MockConnection() : db(openOrCreateLocalDatabase()) {}
 bool MockConnection::isConnected() { return true; }
 
 bool MockConnection::login(std::string name, std::string pass) {
-    //
+  //
   sqlite3_stmt *stmt;
   if (sqlite3_prepare_v2(db.get(),
                          "select id, name, password "
@@ -114,7 +114,7 @@ std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
         "getAllGamesDLCs(): could not prepare statement"s +
         sqlite3_errmsg(db.get()));
   }
-  
+
   sqlite3_bind_int64(stmt, 1, id);
 
   std::vector<DLCInfo> dlcs;
@@ -227,7 +227,35 @@ bool MockConnection::updateGameInfo(GameInfo info) {
 
   auto result = sqlite3_step(stmt);
 
+  sqlite3_finalize(stmt);
+
   return result == SQLITE_DONE;
+}
+
+std::optional<std::string> MockConnection::buyGame(GameInfo::ID id) {
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "insert into gameOwnership (userID, gameID) "
+                         "values(?, ?);",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("buyGame(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return sqlite3_errmsg(db.get());
+  }
+
+  sqlite3_bind_int64(stmt, 1, userID.value());
+  sqlite3_bind_int64(stmt, 2, id);
+
+  auto result = sqlite3_step(stmt);
+
+  sqlite3_finalize(stmt);
+
+  if (result == SQLITE_DONE)
+    return std::nullopt;
+  else
+    return sqlite3_errmsg(db.get());
 }
 
 static MockConnection::db_ptr createLocalDatabase() {

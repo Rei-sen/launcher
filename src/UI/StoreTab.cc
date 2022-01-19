@@ -14,10 +14,22 @@ void StoreTab::onSearchButton(Fl_Widget *, void *v) {
   ((StoreTab *)v)->userSearch(temp);
 }
 
-void StoreTab::onBuyButton(Fl_Widget *, void *v) {
+void StoreTab::onBuyButton(Fl_Widget *, void *_this) {
   // poniżej sprawdzenie czy działa
+  auto tab = ((StoreTab *)_this);
+  int i = tab->gameList->value();
+  if (i != 0) {
 
-  fl_message("Game bought");
+    --i;
+
+    auto result = tab->state.getConnection().buyGame(
+        tab->state.getAllGames()[i].getID());
+    fl_message("Result: %s", result.value_or("Success").c_str());
+
+    tab->state.update();
+    tab->initGamesList();
+  } else
+    fl_message("Error");
 }
 
 void StoreTab::onBrowserClick(Fl_Widget *, void *v) {
@@ -26,9 +38,9 @@ void StoreTab::onBrowserClick(Fl_Widget *, void *v) {
 
 void StoreTab::onDlcBrowserClick(Fl_Widget *, void *v) {
 
-  ((StoreTab *)v)
-      ->loadDLCData(((StoreTab *)v)->gameList->value(),
-                    ((StoreTab *)v)->dlcList->value());
+  // ((StoreTab *)v)
+  //     ->loadDLCData(((StoreTab *)v)->gameList->value(),
+  //                   ((StoreTab *)v)->dlcList->value());
 }
 
 void StoreTab::userSearch(std::string value) {
@@ -106,14 +118,20 @@ void StoreTab::updateGamesList() {
     gameName->value(selectedGame.getTitle().c_str());
     description->set_active();
     descriptionBuf->text(selectedGame.getDescription().c_str());
-    buyButton->set_active();
+
+    statusLabel->set_active();
+    auto ownedGames = state.getUser().getOwnedGames();
+    if (std::find(ownedGames.begin(), ownedGames.end(),
+                  selectedGame.getID()) == ownedGames.end()) {
+      statusLabel->value("Not owned");
+      buyButton->set_active();
+    } else {
+      statusLabel->value("Owned");
+      buyButton->clear_active();
+    }
 
     updateGameDLCsList(selectedGame.getID());
-    statusLabel->set_active();
     dlcList->set_active();
-
-    // temp
-    statusLabel->value("temp");
   }
   redraw();
 }
