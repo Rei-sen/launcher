@@ -16,3 +16,4 @@ void State::update() {
 
 std::vector<GameInfo> &State::getAllGames() { return allGames; }
 std::vector<News> &State::getAllNews() { return allNews; }
+UserInfo &State::getUser() { return *user; }

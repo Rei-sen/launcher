@@ -14,9 +14,13 @@ public:
 
   UserInfo() = delete;
   UserInfo(std::vector<GameInfo::ID> ownedGames,
-           std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> ownedDLCs, ID userID);
+           std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> ownedDLCs,
+           ID userID);
 
   virtual bool hasPublisherAccess() const;
+
+  std::vector<GameInfo::ID> getOwnedGames();
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs();
 
 private:
   std::vector<GameInfo::ID> ownedGames;
