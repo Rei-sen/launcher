@@ -10,12 +10,11 @@
 #include <FL/Fl_Scroll.H>
 #include <FL/Fl_Text_Editor.H>
 #include <FL/Fl_Tree.H>
-#include <FL/FL_Tree_Item.H>
 #include <FL/fl_ask.H>
 
-#include <stdexcept>
 #include <algorithm>
 #include <ranges>
+#include <stdexcept>
 
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
@@ -45,11 +44,11 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
     {
       Fl_Group *o = new Fl_Group(10, 240, 595, 205, "News");
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
-      newsTree =   new Fl_Tree(10, 245, 155, 170);                         // Fl_Tree* o
+      newsTree = new Fl_Tree(10, 245, 155, 170); // Fl_Tree* o
       newsTree->root_label("Games");
       newsTree->callback(onNewsTreeSelected, (void *)this);
       { newsTitle = new Fl_Input(230, 245, 360, 30, "title"); } // Fl_Input* o
-      { 
+      {
         newsUpdateAdd = new Fl_Button(500, 410, 90, 25, "Update/Add");
         newsUpdateAdd->callback(onUpdateNews, (void *)this);
       } // Fl_Button* o
@@ -87,7 +86,8 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
   initAllGroups();
 }
 
-void PublisherTab::initAllGroups() { initGameGroup();
+void PublisherTab::initAllGroups() {
+  initGameGroup();
   initNewsGroup();
 }
 
@@ -108,7 +108,6 @@ void PublisherTab::initNewsGroup() {
   newsTree->select("Games");
   newsTree->callback_item(newsTree->root());
 
-
   for (auto game : games) {
     std::string temp = ("/" + game.getTitle());
     newsTree->add(temp.c_str());
@@ -117,12 +116,12 @@ void PublisherTab::initNewsGroup() {
   std::for_each(news.begin(), news.end(), [&](News n) {
     auto gamename = std::find_if(games.begin(), games.end(), [&](GameInfo nn) {
       return nn.getID() == n.getGameID();
-        });
+    });
     std::string temp = ("/" + gamename->getTitle() + "/" + n.getTitle());
     newsTree->add(temp.c_str());
   });
   redraw();
-  //updateGameGroup();
+  // updateGameGroup();
 }
 
 void PublisherTab::updateGameGroup() {
@@ -156,15 +155,13 @@ void PublisherTab::updateNewsGroup() {
 
   if (newsTree->callback_item()->is_root()) {
 
-
     newsTitle->clear_active();
     newsTitle->value("");
     newsContent->clear_active();
     newsContentBuf->text("");
     newsUpdateAdd->clear_active();
     newsUpdateAdd->label("Add/Update");
-  }
-  else if (newsTree->callback_item()->parent()->is_root()) {
+  } else if (newsTree->callback_item()->parent()->is_root()) {
     newsTitle->set_active();
     newsTitle->value("");
     newsContent->set_active();
@@ -172,8 +169,7 @@ void PublisherTab::updateNewsGroup() {
     newsUpdateAdd->set_active();
     newsUpdateAdd->label("Add");
 
-    } 
-  else {//here get all contents of this stuff
+  } else { // here get all contents of this stuff
     GameInfo::ID iddd;
     auto ne = std::find_if(games.begin(), games.end(), [&](GameInfo n) {
       std::string temp = newsTree->callback_item()->parent()->label();
@@ -197,8 +193,6 @@ void PublisherTab::updateNewsGroup() {
   }
   redraw();
 }
-
-
 
 void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateGameGroup();
@@ -235,39 +229,34 @@ void PublisherTab::onUpdateNews(Fl_Widget *, void *_this) {
   auto news = tab->state.getAllNews();
   auto callback = tab->newsTree->callback_item();
   if (callback == nullptr || callback->parent() == nullptr ||
-        callback->parent()->is_root())
+      callback->parent()->is_root())
     return;
 
   GameInfo::ID idG;
   News::ID idN;
   std::string temp = tab->newsTree->callback_item()->parent()->label();
-  auto ne = std::find_if(games.begin(), games.end(), [&](GameInfo n) {
-    return n.getTitle() == temp;
-  });
+  auto ne = std::find_if(games.begin(), games.end(),
+                         [&](GameInfo n) { return n.getTitle() == temp; });
   if (ne == games.end())
     return;
   temp = tab->newsTree->callback_item()->label();
-    idG = ne->getID();
-    auto ne2 = std::find_if(news.begin(), news.end(), [&](News n) {
-      return n.getTitle() == temp && idG == n.getGameID();
-    });
+  idG = ne->getID();
+  auto ne2 = std::find_if(news.begin(), news.end(), [&](News n) {
+    return n.getTitle() == temp && idG == n.getGameID();
+  });
   if (ne2 == news.end())
-      return;
+    return;
   idN = ne2->getID();
 
-  News newnews(idN, idG,tab->newsTitle->value(), tab->newsContentBuf->text());
+  News newnews(idN, idG, tab->newsTitle->value(), tab->newsContentBuf->text());
 
   tab->state.getConnection().updateNewsInfo(newnews);
 
   tab->state.update();
   tab->initAllGroups();
-
 }
 
-void PublisherTab::onAddNews(Fl_Widget *, void *_this) {
-
-
-}
+void PublisherTab::onAddNews(Fl_Widget *, void *_this) {}
 
 void PublisherTab::onNewsTreeSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateNewsGroup();
