@@ -27,21 +27,24 @@ private:
   void initGameGroup();
   void initNewsGroup();
   void updateGameGroup();
+  void updateNewsGroup();
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
   static void onUpdateGame(Fl_Widget *, void *);
+  static void onNewsTreeSelected(Fl_Widget *, void *);
 
 private:
   Fl_Hold_Browser *gameBrowser;
-  Fl_Tree *newsTree;
   Fl_Input *gameName;
   Fl_Float_Input *gamePrice;
   Fl_Text_Editor *gameDescription;
   Fl_Text_Buffer *gameDescriptionBuf;
   Fl_Button *updateGameButton;
   // group of news
+  Fl_Tree *newsTree;
   Fl_Input *newsTitle;
   Fl_Text_Editor *newsContent;
+  Fl_Text_Buffer *newsContentBuf;
   Fl_Button *newsUpdateAdd;
   // socials
   Fl_Input *socialsAddress;

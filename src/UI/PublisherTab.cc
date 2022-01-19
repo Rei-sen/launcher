@@ -46,14 +46,16 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       o->align(Fl_Align(FL_ALIGN_TOP_LEFT));
       newsTree =   new Fl_Tree(10, 245, 155, 170);                         // Fl_Tree* o
       newsTree->root_label("Games");
-      //auto node = newsTree->add("CUCKOLD SIMULATOR: LIFE OF A BETA CUCK");
+      newsTree->callback(onNewsTreeSelected, (void *)this);
       { newsTitle = new Fl_Input(230, 245, 360, 30, "title"); } // Fl_Input* o
       { 
         newsUpdateAdd = new Fl_Button(500, 410, 90, 25, "Update/Add");
 
       } // Fl_Button* o
       {
+        newsContentBuf = new Fl_Text_Buffer;
         newsContent = new Fl_Text_Editor(230, 290, 360, 110, "Content");
+        newsContent->buffer(newsContentBuf);
         o->align(Fl_Align(FL_ALIGN_LEFT));
       } // Fl_Text_Editor* o
       o->end();
@@ -101,6 +103,11 @@ void PublisherTab::initNewsGroup() {
   auto news = state.getAllNews();
   auto games = state.getAllGames();
 
+  for (auto game : games) {
+    std::string temp = ("/" + game.getTitle());
+    newsTree->add(temp.c_str());
+  }
+
   std::for_each(news.begin(), news.end(), [&](News n) {
     auto gamename = std::find_if(games.begin(), games.end(), [&](GameInfo nn) {
       return nn.getID() == n.getGameID();
@@ -108,22 +115,8 @@ void PublisherTab::initNewsGroup() {
     std::string temp = ("/" + gamename->getTitle() + "/" + n.getTitle());
     newsTree->add(temp.c_str());
   });
-  /* for (auto game : games) {
-    std::vector<News> gamenews;
-     GameInfo::ID id = game.getID();
-    std::for_each(news.begin(), news.end(), [](News n) { if (n.getGameID()==game.ge)
-        }
-    )
-    while (newss != news.end()) {
-      dostuff();
-        newsTree->add();
 
-
-        }
-    }
-    */
   //updateGameGroup();
-
 }
 
 void PublisherTab::updateGameGroup() {
@@ -148,6 +141,54 @@ void PublisherTab::updateGameGroup() {
     updateGameButton->set_active();
   }
 
+  redraw();
+}
+
+void PublisherTab::updateNewsGroup() {
+  auto news = state.getAllNews();
+  auto games = state.getAllGames();
+
+  if (newsTree->callback_item()->is_root()) {
+
+
+    newsTitle->clear_active();
+    newsTitle->value("");
+    newsContent->clear_active();
+    newsContentBuf->text("");
+    newsUpdateAdd->clear_active();
+    newsUpdateAdd->label("Add/Update");
+  }
+  else if (newsTree->callback_item()->parent()->is_root()) {
+    newsTitle->set_active();
+    newsTitle->value("");
+    newsContent->set_active();
+    newsContentBuf->text("");
+    newsUpdateAdd->set_active();
+    newsUpdateAdd->label("Add");
+
+    } 
+  else {//here get all contents of this stuff
+    GameInfo::ID iddd;
+    auto ne = std::find_if(games.begin(), games.end(), [&](GameInfo n) {
+      std::string temp = newsTree->callback_item()->parent()->label();
+      return n.getTitle() == temp;
+    });
+    if (ne != games.end()) {
+
+      iddd = ne->getID();
+      auto ne2 = std::find_if(news.begin(), news.end(), [&](News n) {
+        std::string temp = newsTree->callback_item()->label();
+        return n.getTitle() == temp && iddd == n.getGameID();
+      });
+
+      newsTitle->set_active();
+      newsTitle->value(ne2->getTitle().c_str());
+      newsContent->set_active();
+      newsContentBuf->text(ne2->getContent().c_str());
+      newsUpdateAdd->set_active();
+      newsUpdateAdd->label("Update");
+    }
+  }
   redraw();
 }
 
@@ -178,4 +219,8 @@ void PublisherTab::onUpdateGame(Fl_Widget *, void *_this) {
 
   tab->state.update();
   tab->initAllGroups();
+}
+
+void PublisherTab::onNewsTreeSelected(Fl_Widget *, void *_this) {
+  ((PublisherTab *)_this)->updateNewsGroup();
 }
