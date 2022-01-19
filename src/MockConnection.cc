@@ -7,8 +7,8 @@
 #include <sstream>
 #include <utility>
 
-#include "PublisherInfo.hh"
 #include "News.hh"
+#include "PublisherInfo.hh"
 
 namespace fs = std::filesystem;
 
@@ -120,16 +120,14 @@ std::vector<News> MockConnection::getAllNews() {
     News::ID idn = sqlite3_column_int64(stmt, 1);
 
     // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
-     news.emplace_back(idn, idn,
-                       (char *)sqlite3_column_text(stmt, 2),
-                       (char *)sqlite3_column_text(stmt, 3));
+    news.emplace_back(id, idn, (char *)sqlite3_column_text(stmt, 2),
+                      (char *)sqlite3_column_text(stmt, 3));
   }
 
   sqlite3_finalize(stmt);
 
   return news;
 }
-
 
 std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
   sqlite3_stmt *stmt;
@@ -262,7 +260,7 @@ bool MockConnection::updateGameInfo(GameInfo info) {
   return result == SQLITE_DONE;
 }
 
-bool MockConnection::updateNewsInfo(News info) { 
+bool MockConnection::updateNewsInfo(News info) {
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db.get(),
@@ -277,8 +275,7 @@ bool MockConnection::updateNewsInfo(News info) {
   }
   // transient bo stringi są dealokowane po wywołaniu funkcji
   sqlite3_bind_text(stmt, 1, info.getTitle().c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 2, info.getContent().c_str(), -1,
-                    SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, info.getContent().c_str(), -1, SQLITE_TRANSIENT);
   sqlite3_bind_int64(stmt, 3, info.getID());
   sqlite3_bind_int64(stmt, 4, info.getGameID());
 
