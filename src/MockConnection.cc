@@ -258,6 +258,34 @@ std::optional<std::string> MockConnection::buyGame(GameInfo::ID id) {
     return sqlite3_errmsg(db.get());
 }
 
+std::optional<std::string> MockConnection::buyDLC(GameInfo::ID gameId,
+                                                  DLCInfo::ID id) {
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "insert into dlcOwnership (userID, gameID, dlcID) "
+                         "values(?, ?, ?);",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("buyGame(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return sqlite3_errmsg(db.get());
+  }
+
+  sqlite3_bind_int64(stmt, 1, userID.value());
+  sqlite3_bind_int64(stmt, 2, gameId);
+  sqlite3_bind_int64(stmt, 3, id);
+
+  auto result = sqlite3_step(stmt);
+
+  sqlite3_finalize(stmt);
+
+  if (result == SQLITE_DONE)
+    return std::nullopt;
+  else
+    return sqlite3_errmsg(db.get());
+}
+
 static MockConnection::db_ptr createLocalDatabase() {
   auto db = openLocalDatabase();
 

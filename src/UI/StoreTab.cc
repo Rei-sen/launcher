@@ -5,6 +5,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
 
+#include <iostream>
 #include <ranges>
 #include <sstream>
 #include <string>
@@ -22,7 +23,9 @@ public:
   }
 
   void set(std::vector<DLCInfo> dlcs,
-           std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> owned) {
+           std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> owned,
+           void (*callback)(Fl_Widget *, void *),
+           std::vector<std::pair<unsigned, void *>> &argList) {
     clear();
     rows(dlcs.size());
     cols(3);
@@ -46,6 +49,7 @@ public:
           }) == owned.end()) {
         btn->label("Buy");
         btn->set_active();
+        btn->callback(callback, (void *)&argList[i]);
       } else {
         btn->label("Owned");
         btn->clear_active();
@@ -96,12 +100,22 @@ void StoreTab::onBrowserClick(Fl_Widget *, void *v) {
   ((StoreTab *)v)->updateGamesList();
 }
 
-void StoreTab::onDlcBrowserClick(Fl_Widget *, void *v) {
+void StoreTab::onDlcBrowserClick(Fl_Widget *, void *arg) {
+  auto argument = (std::pair<unsigned, void *> *)arg;
+  auto tab = (StoreTab *)std::get<1>(*argument);
+  unsigned i = std::get<0>(*argument);
 
-  // ((StoreTab *)v)
-  //     ->loadDLCData(((StoreTab *)v)->gameList->value(),
-  //                   ((StoreTab *)v)->dlcList->value());
+  auto dlc = tab->shownDLCs[i];
+
+  auto result =
+      tab->state.getConnection().buyDLC(dlc.getGameID(), dlc.getID());
+
+  fl_message("Result: %s", result.value_or("Success").c_str());
+  tab->state.update();
+  tab->initGamesList();
+  std::cout << i << std::endl;
 }
+
 void StoreTab::loadDLCData(int gameID, int dlcID) {
   buyButton->set_active();
   DLCInfo temp = shownGames[gameID - 1].getDLCs()[dlcID - 1];
@@ -111,16 +125,19 @@ void StoreTab::loadDLCData(int gameID, int dlcID) {
 
 void StoreTab::updateGameDLCsList(GameInfo game) {
   dlcList->clear();
+  tableArgs.clear();
   shownDLCs.clear();
   auto dlcs = game.getDLCs();
   auto ownedDlcs = state.getUser().getOwnedDLCs();
 
+  unsigned i = 0;
   for (auto dlc : dlcs | std::views::filter([game](auto d) {
                     return game.getID() == d.getGameID();
                   })) {
     shownDLCs.push_back(dlc);
+    tableArgs.push_back(std::make_pair(i++, this));
   }
-  dlcList->set(shownDLCs, ownedDlcs);
+  dlcList->set(shownDLCs, ownedDlcs, onDlcBrowserClick, tableArgs);
   redraw();
 }
 
@@ -210,8 +227,6 @@ StoreTab::StoreTab(State &s) : Tab("Store", s) {
 
   dlcList = new DLCTable(251, 335, 354, 100, "DLC");
   dlcList->align(Fl_Align(FL_ALIGN_TOP));
-  dlcList->callback(onDlcBrowserClick, this);
-  dlcList->cols(3);
   // Fl_Browser* o
 
   description = new Fl_Text_Display(251, 125, 354, 178);

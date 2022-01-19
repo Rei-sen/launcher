@@ -48,4 +48,8 @@ private:
   Fl_Output *gameName;
   Fl_Button *buyButton;
   Fl_Button *searchButton;
+
+  // Chyba najgłupszy sposób przekazania argumentów do callback'u ale nie
+  // chce mi się wymyślać nic innego co by działało
+  std::vector<std::pair<unsigned, void *>> tableArgs;
 };
