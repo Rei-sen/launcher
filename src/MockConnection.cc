@@ -106,11 +106,11 @@ std::vector<News> MockConnection::getAllNews() {
   sqlite3_stmt *stmt;
 
   if (sqlite3_prepare_v2(db.get(),
-                         "select id, id, title, content "
+                         "select gameID, id, title, content "
                          "from news",
                          -1, &stmt, nullptr)) {
     using namespace std::string_literals;
-    throw std::runtime_error("getAllGames(): could not prepare statement"s +
+    throw std::runtime_error("getAllNews(): could not prepare statement"s +
                              sqlite3_errmsg(db.get()));
   }
 

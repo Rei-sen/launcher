@@ -105,6 +105,10 @@ void PublisherTab::initNewsGroup() {
   auto games = state.getAllGames();
   newsTree->clear();
   newsTree->root_label("Games");
+  newsTree->select("Games");
+  newsTree->callback_item(newsTree->root());
+
+
   for (auto game : games) {
     std::string temp = ("/" + game.getTitle());
     newsTree->add(temp.c_str());
@@ -117,7 +121,7 @@ void PublisherTab::initNewsGroup() {
     std::string temp = ("/" + gamename->getTitle() + "/" + n.getTitle());
     newsTree->add(temp.c_str());
   });
-
+  redraw();
   //updateGameGroup();
 }
 
@@ -201,7 +205,9 @@ void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
 }
 
 void PublisherTab::onUpdateGame(Fl_Widget *, void *_this) {
+
   auto tab = (PublisherTab *)_this;
+
   auto oldInfo = tab->state.getAllGames()[tab->gameBrowser->value() - 1];
 
   double newPrice;
@@ -227,19 +233,22 @@ void PublisherTab::onUpdateNews(Fl_Widget *, void *_this) {
   auto tab = (PublisherTab *)_this;
   auto games = tab->state.getAllGames();
   auto news = tab->state.getAllNews();
+  auto callback = tab->newsTree->callback_item();
+  if (callback == nullptr || callback->parent() == nullptr ||
+        callback->parent()->is_root())
+    return;
 
   GameInfo::ID idG;
   News::ID idN;
+  std::string temp = tab->newsTree->callback_item()->parent()->label();
   auto ne = std::find_if(games.begin(), games.end(), [&](GameInfo n) {
-    std::string temp = tab->newsTree->callback_item()->parent()->label();
     return n.getTitle() == temp;
   });
   if (ne == games.end())
     return;
-
+  temp = tab->newsTree->callback_item()->label();
     idG = ne->getID();
     auto ne2 = std::find_if(news.begin(), news.end(), [&](News n) {
-      std::string temp = tab->newsTree->callback_item()->label();
       return n.getTitle() == temp && idG == n.getGameID();
     });
   if (ne2 == news.end())
