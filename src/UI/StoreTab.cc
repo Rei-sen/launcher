@@ -56,10 +56,22 @@ public:
   }
 };
 
-void StoreTab::onSearchButton(Fl_Widget *, void *v) {
-  ((StoreTab *)v)->gameName->value(((StoreTab *)v)->searchInput->value());
-  std::string temp = ((StoreTab *)v)->searchInput->value();
-  ((StoreTab *)v)->userSearch(temp);
+void StoreTab::onSearchButton(Fl_Widget *, void *_this) {
+  auto tab = (StoreTab *)_this;
+
+  tab->shownGames.clear();
+  tab->gameList->clear();
+
+  for (auto game :
+       tab->state.getAllGames() | std::views::filter([tab](auto game) {
+         return game.getTitle().find(tab->searchInput->value()) !=
+                std::string::npos;
+       })) {
+    tab->gameList->add(game.getTitle().c_str(), _this);
+    tab->shownGames.push_back(game);
+  }
+
+  tab->updateGamesList();
 }
 
 void StoreTab::onBuyButton(Fl_Widget *, void *_this) {
@@ -90,42 +102,6 @@ void StoreTab::onDlcBrowserClick(Fl_Widget *, void *v) {
   //     ->loadDLCData(((StoreTab *)v)->gameList->value(),
   //                   ((StoreTab *)v)->dlcList->value());
 }
-
-void StoreTab::userSearch(std::string value) {
-  int i = 0;
-  std::vector<GameInfo> tempVect;
-  for (auto game : state.getAllGames()) {
-    std::string temp = game.getTitle().c_str();
-    if (temp.find(value) != std::string::npos) {
-      if (i == 0) {
-        priceLabel->clear_active();
-        priceLabel->value("");
-        gameName->clear_active();
-        gameName->value("");
-        description->clear_active();
-        descriptionBuf->text("");
-        buyButton->clear_active();
-
-        shownGames.clear();
-
-        statusLabel->clear_active();
-        dlcList->clear();
-        dlcList->clear_active();
-        gameList->clear();
-      }
-      gameList->add(game.getTitle().c_str(), (void *)this);
-      tempVect.push_back(game);
-      i++;
-    }
-  }
-  if (tempVect.size()) {
-    shownGames.clear();
-    shownGames = tempVect;
-  } else {
-    fl_alert("No game found");
-  }
-}
-
 void StoreTab::loadDLCData(int gameID, int dlcID) {
   buyButton->set_active();
   DLCInfo temp = shownGames[gameID - 1].getDLCs()[dlcID - 1];

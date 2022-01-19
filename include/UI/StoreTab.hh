@@ -33,7 +33,6 @@ private:
   std::vector<GameInfo> shownGames;
   std::vector<DLCInfo> shownDLCs;
 
-  void userSearch(std::string value);
   void initGamesList();
   void updateGamesList();
   void updateGameDLCsList(GameInfo game);
