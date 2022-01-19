@@ -102,7 +102,8 @@ void PublisherTab::initGameGroup() {
 void PublisherTab::initNewsGroup() {
   auto news = state.getAllNews();
   auto games = state.getAllGames();
-
+  newsTree->clear();
+  newsTree->root_label("Games");
   for (auto game : games) {
     std::string temp = ("/" + game.getTitle());
     newsTree->add(temp.c_str());
