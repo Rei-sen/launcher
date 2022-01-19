@@ -5,8 +5,56 @@
 #include <FL/Fl_Button.H>
 #include <FL/fl_ask.H>
 
+#include <ranges>
 #include <sstream>
 #include <string>
+
+class DLCTable : public Fl_Table {
+public:
+  DLCTable(int x, int y, int w, int h, const char *l = 0)
+      : Fl_Table(x, y, w, h, l) {
+    col_resize(1);
+    col_header_height(25);
+    row_resize(0);
+    row_header_width(80);
+    cols(3);
+    end();
+  }
+
+  void set(std::vector<DLCInfo> dlcs,
+           std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> owned) {
+    clear();
+    rows(dlcs.size());
+    cols(3);
+
+    begin();
+    for (unsigned i = 0; i < dlcs.size(); ++i) {
+      int x, y, w, h;
+
+      find_cell(CONTEXT_TABLE, i, 0, x, y, w, h);
+      auto title = new Fl_Output(x, y, w, h);
+      title->value(dlcs[i].getTitle().c_str());
+      find_cell(CONTEXT_TABLE, i, 1, x, y, w, h);
+      auto price = new Fl_Output(x, y, w, h);
+      price->value(std::to_string(dlcs[i].getPrice()).c_str());
+      find_cell(CONTEXT_TABLE, i, 2, x, y, w, h);
+
+      auto btn = new Fl_Button(x, y, w, h);
+      if (std::find_if(owned.begin(), owned.end(), [dlcs, i](auto pair) {
+            return dlcs[i].getGameID() == std::get<0>(pair) &&
+                   dlcs[i].getID() == std::get<1>(pair);
+          }) == owned.end()) {
+        btn->label("Buy");
+        btn->set_active();
+      } else {
+        btn->label("Owned");
+        btn->clear_active();
+      }
+    }
+    end();
+    redraw();
+  }
+};
 
 void StoreTab::onSearchButton(Fl_Widget *, void *v) {
   ((StoreTab *)v)->gameName->value(((StoreTab *)v)->searchInput->value());
@@ -58,7 +106,7 @@ void StoreTab::userSearch(std::string value) {
         descriptionBuf->text("");
         buyButton->clear_active();
 
-        gamesVect.clear();
+        shownGames.clear();
 
         statusLabel->clear_active();
         dlcList->clear();
@@ -71,8 +119,8 @@ void StoreTab::userSearch(std::string value) {
     }
   }
   if (tempVect.size()) {
-    gamesVect.clear();
-    gamesVect = tempVect;
+    shownGames.clear();
+    shownGames = tempVect;
   } else {
     fl_alert("No game found");
   }
@@ -80,18 +128,24 @@ void StoreTab::userSearch(std::string value) {
 
 void StoreTab::loadDLCData(int gameID, int dlcID) {
   buyButton->set_active();
-  DLCInfo temp = gamesVect[gameID - 1].getDLCs()[dlcID - 1];
+  DLCInfo temp = shownGames[gameID - 1].getDLCs()[dlcID - 1];
   priceLabel->value(std::to_string(temp.getPrice()).c_str());
   gameName->value(temp.getTitle().c_str());
 }
 
-void StoreTab::updateGameDLCsList(int gameID) {
+void StoreTab::updateGameDLCsList(GameInfo game) {
   dlcList->clear();
+  shownDLCs.clear();
+  auto dlcs = game.getDLCs();
+  auto ownedDlcs = state.getUser().getOwnedDLCs();
 
-  dlcList->clear();
-  for (auto gameDLC : state.getConnection().getAllGamesDLCs(gameID)) {
-    dlcList->add(gameDLC.getTitle().c_str(), (void *)this);
+  for (auto dlc : dlcs | std::views::filter([game](auto d) {
+                    return game.getID() == d.getGameID();
+                  })) {
+    shownDLCs.push_back(dlc);
   }
+  dlcList->set(shownDLCs, ownedDlcs);
+  redraw();
 }
 
 void StoreTab::updateGamesList() {
@@ -111,7 +165,7 @@ void StoreTab::updateGamesList() {
 
   } else {
     --i;
-    auto selectedGame = gamesVect[i];
+    auto selectedGame = shownGames[i];
     priceLabel->set_active();
     priceLabel->value(std::to_string(selectedGame.getPrice()).c_str());
     gameName->set_active();
@@ -130,8 +184,8 @@ void StoreTab::updateGamesList() {
       buyButton->clear_active();
     }
 
-    updateGameDLCsList(selectedGame.getID());
     dlcList->set_active();
+    updateGameDLCsList(selectedGame);
   }
   redraw();
 }
@@ -141,7 +195,7 @@ void StoreTab::initGamesList() {
 
   for (auto game : state.getAllGames()) {
     gameList->add(game.getTitle().c_str(), (void *)this);
-    gamesVect.push_back(game);
+    shownGames.push_back(game);
   }
 
   updateGamesList();
@@ -178,9 +232,10 @@ StoreTab::StoreTab(State &s) : Tab("Store", s) {
   statusLabel = new Fl_Output(303, 85, 123, 30, "Staus");
   // Fl_Output* statusLabel
 
-  dlcList = new Fl_Hold_Browser(251, 335, 354, 100, "DLC");
+  dlcList = new DLCTable(251, 335, 354, 100, "DLC");
   dlcList->align(Fl_Align(FL_ALIGN_TOP));
   dlcList->callback(onDlcBrowserClick, this);
+  dlcList->cols(3);
   // Fl_Browser* o
 
   description = new Fl_Text_Display(251, 125, 354, 178);

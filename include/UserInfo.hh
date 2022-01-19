@@ -20,6 +20,7 @@ public:
   virtual bool hasPublisherAccess() const;
 
   std::vector<GameInfo::ID> getOwnedGames();
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs();
 
 private:
   std::vector<GameInfo::ID> ownedGames;

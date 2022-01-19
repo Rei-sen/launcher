@@ -9,3 +9,7 @@ UserInfo::UserInfo(std::vector<GameInfo::ID> ownedGames,
 bool UserInfo::hasPublisherAccess() const { return false; }
 
 std::vector<GameInfo::ID> UserInfo::getOwnedGames() { return ownedGames; }
+
+std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> UserInfo::getOwnedDLCs() {
+  return ownedDLCs;
+}

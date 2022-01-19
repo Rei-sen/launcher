@@ -6,9 +6,12 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Hold_Browser.H>
 #include <FL/Fl_Output.H>
+#include <FL/Fl_Table.H>
 #include <FL/Fl_Text_Display.H>
 
 #include "UI/Tab.hh"
+
+class DLCTable;
 
 class StoreTab : public Tab {
 public:
@@ -27,12 +30,13 @@ public:
   static void onDlcBrowserClick(Fl_Widget *, void *v);
 
 private:
-  std::vector<GameInfo> gamesVect;
+  std::vector<GameInfo> shownGames;
+  std::vector<DLCInfo> shownDLCs;
 
   void userSearch(std::string value);
   void initGamesList();
   void updateGamesList();
-  void updateGameDLCsList(int gameID);
+  void updateGameDLCsList(GameInfo game);
   void loadDLCData(int gameID, int dlcID);
 
   Fl_Output *priceLabel;
@@ -41,7 +45,7 @@ private:
   Fl_Text_Buffer *descriptionBuf;
   Fl_Input *searchInput;
   Fl_Hold_Browser *gameList;
-  Fl_Hold_Browser *dlcList;
+  DLCTable *dlcList;
   Fl_Output *gameName;
   Fl_Button *buyButton;
   Fl_Button *searchButton;
