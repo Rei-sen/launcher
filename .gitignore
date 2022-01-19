@@ -39,3 +39,6 @@ build/
 *.out
 *.app
 *.sqlt
+
+*.ldb
+CMakeSettings.json
