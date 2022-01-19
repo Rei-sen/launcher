@@ -30,8 +30,11 @@ private:
   void updateNewsGroup();
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
-  static void onUpdateGame(Fl_Widget *, void *);
   static void onNewsTreeSelected(Fl_Widget *, void *);
+
+  static void onUpdateGame(Fl_Widget *, void *);
+  static void onUpdateNews(Fl_Widget *, void *);
+  static void onAddNews(Fl_Widget *, void *);
 
 private:
   Fl_Hold_Browser *gameBrowser;

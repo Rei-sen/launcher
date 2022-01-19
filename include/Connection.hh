@@ -33,4 +33,5 @@ public:
   virtual std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> getOwnedDLCs() = 0;
 
   virtual bool updateGameInfo(GameInfo info) = 0;
+  virtual bool updateNewsInfo(News info) = 0;
 };

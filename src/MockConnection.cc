@@ -260,6 +260,31 @@ bool MockConnection::updateGameInfo(GameInfo info) {
   return result == SQLITE_DONE;
 }
 
+bool MockConnection::updateNewsInfo(News info) { 
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "update news "
+                         "set title = ?, content = ?"
+                         "where id = ? and gameID = ?;",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("updateNewsInfo(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return false;
+  }
+  // transient bo stringi są dealokowane po wywołaniu funkcji
+  sqlite3_bind_text(stmt, 1, info.getTitle().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, info.getContent().c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_int64(stmt, 3, info.getID());
+  sqlite3_bind_int64(stmt, 4, info.getGameID());
+
+  auto result = sqlite3_step(stmt);
+
+  return result == SQLITE_DONE;
+}
+
 static MockConnection::db_ptr createLocalDatabase() {
   auto db = openLocalDatabase();
 
