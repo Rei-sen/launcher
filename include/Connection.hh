@@ -24,6 +24,7 @@ public:
                                                      std::string pass) = 0;
 
   virtual std::vector<GameInfo> getAllGames() = 0;
+  virtual std::vector<News> getAllNews() = 0;
   // zwraca wszystkie dlc dla danej gry
   virtual std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) = 0;
 
@@ -33,6 +34,9 @@ public:
 
   virtual bool updateGameInfo(GameInfo info) = 0;
 
-  virtual std::vector<News> getAllNews() = 0;
-  //
+  virtual bool updateNewsInfo(News info) = 0;
+
+  virtual std::optional<std::string> buyGame(GameInfo::ID id) = 0;
+  virtual std::optional<std::string> buyDLC(GameInfo::ID gameId,
+                                            DLCInfo::ID id) = 0;
 };

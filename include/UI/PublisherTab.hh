@@ -3,6 +3,7 @@
 
 #include "FL/Fl_Hold_Browser.H"
 #include <FL/Fl_Browser.H>
+#include <FL/Fl_Tree.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Float_Input.H>
@@ -24,10 +25,16 @@ public:
 private:
   void initAllGroups();
   void initGameGroup();
+  void initNewsGroup();
   void updateGameGroup();
+  void updateNewsGroup();
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
+  static void onNewsTreeSelected(Fl_Widget *, void *);
+
   static void onUpdateGame(Fl_Widget *, void *);
+  static void onUpdateNews(Fl_Widget *, void *);
+  static void onAddNews(Fl_Widget *, void *);
 
 private:
   Fl_Hold_Browser *gameBrowser;
@@ -37,8 +44,10 @@ private:
   Fl_Text_Buffer *gameDescriptionBuf;
   Fl_Button *updateGameButton;
   // group of news
+  Fl_Tree *newsTree;
   Fl_Input *newsTitle;
   Fl_Text_Editor *newsContent;
+  Fl_Text_Buffer *newsContentBuf;
   Fl_Button *newsUpdateAdd;
   // socials
   Fl_Input *socialsAddress;

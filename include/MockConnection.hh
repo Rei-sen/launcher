@@ -3,8 +3,10 @@
 
 #include <sqlite3.h>
 
+
 #include "Connection.hh"
 #include "UserInfo.hh"
+#include "News.hh"
 
 class MockConnection : public Connection {
 public:
@@ -21,6 +23,7 @@ public:
                                              std::string pass) override;
 
   std::vector<GameInfo> getAllGames() override;
+  std::vector<News> getAllNews() override;
   std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) override;
 
   std::unique_ptr<UserInfo> getUserInfo() override;
@@ -29,9 +32,13 @@ public:
 
   bool updateGameInfo(GameInfo info) override;
 
-  std::vector<News> getAllNews() override;
+  bool updateNewsInfo(News info) override;
 
-  //
+  std::optional<std::string> buyGame(GameInfo::ID id) override;
+  std::optional<std::string> buyDLC(GameInfo::ID gameId,
+                                    DLCInfo::ID id) override;
+
+
 private:
   struct DBDeleter {
     void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }

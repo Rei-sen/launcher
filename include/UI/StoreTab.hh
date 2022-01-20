@@ -2,12 +2,16 @@
 
 #pragma once
 
-#include <FL/Fl_Output.H>
 #include <FL/Fl_Browser.H>
-#include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_Hold_Browser.H>
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Table.H>
+#include <FL/Fl_Text_Display.H>
 
 #include "UI/Tab.hh"
+
+class DLCTable;
 
 class StoreTab : public Tab {
 public:
@@ -26,13 +30,26 @@ public:
   static void onDlcBrowserClick(Fl_Widget *, void *v);
 
 private:
+  std::vector<GameInfo> shownGames;
+  std::vector<DLCInfo> shownDLCs;
+
+  void initGamesList();
+  void updateGamesList();
+  void updateGameDLCsList(GameInfo game);
+  void loadDLCData(int gameID, int dlcID);
+
   Fl_Output *priceLabel;
   Fl_Output *statusLabel;
   Fl_Text_Display *description;
+  Fl_Text_Buffer *descriptionBuf;
   Fl_Input *searchInput;
-  Fl_Browser *gameList;
-  Fl_Browser *dlcList;
+  Fl_Hold_Browser *gameList;
+  DLCTable *dlcList;
   Fl_Output *gameName;
   Fl_Button *buyButton;
   Fl_Button *searchButton;
+
+  // Chyba najgłupszy sposób przekazania argumentów do callback'u ale nie
+  // chce mi się wymyślać nic innego co by działało
+  std::vector<std::pair<unsigned, void *>> tableArgs;
 };
