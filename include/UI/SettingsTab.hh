@@ -21,4 +21,8 @@ public:
 private:
   Fl_Input *newNameField;
   Fl_Input *newPasswordField;
+
+  void updateHelper(std::string newLogin, std::string newPassword); 
+
+
 };
