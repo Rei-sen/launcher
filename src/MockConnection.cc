@@ -102,7 +102,31 @@ std::vector<GameInfo> MockConnection::getAllGames() {
   return games;
 }
 
+std::vector<SocialMedia> MockConnection::getAllSocials() {
+  sqlite3_stmt *stmt;
 
+  if (sqlite3_prepare_v2(db.get(),
+                         "select name, address "
+                         "from socialMedias",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("getAllSocials(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  std::vector<SocialMedia> socials;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+    // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
+    socials.emplace_back((char *)sqlite3_column_text(stmt, 0),
+                       (char *)sqlite3_column_text(stmt, 1));
+  }
+
+  sqlite3_finalize(stmt);
+
+  return socials;
+
+
+}
 
 std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
   sqlite3_stmt *stmt;

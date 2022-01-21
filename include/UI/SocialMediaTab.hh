@@ -2,6 +2,12 @@
 #pragma once
 
 #include "UI/Tab.hh"
+#include "SocialMedia.hh"
+
+#include <FL/Fl_Output.H>
+#include <FL/Fl_Table.H>
+
+class SocialsTable;
 
 class SocialMediaTab : public Tab {
 public:
@@ -10,4 +16,12 @@ public:
   virtual ~SocialMediaTab() = default;
 
   SocialMediaTab(State &s);
+
+private:
+  void initTab(); 
+	  
+	  SocialsTable *newsTable;
+  std::vector<SocialMedia> listOfSocials;
+
+
 };

@@ -7,6 +7,8 @@
 #include "Connection.hh"
 #include "UserInfo.hh"
 #include "News.hh"
+#include "SocialMedia.hh"
+
 
 class MockConnection : public Connection {
 public:
@@ -40,6 +42,8 @@ public:
 
   bool updateUserLoginPassword(std::string uName,
                                std::string uPassword) override;
+
+  std::vector<SocialMedia> getAllSocials() override;
 
 private:
   struct DBDeleter {
