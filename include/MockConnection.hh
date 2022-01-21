@@ -38,6 +38,8 @@ public:
   std::optional<std::string> buyDLC(GameInfo::ID gameId,
                                     DLCInfo::ID id) override;
 
+  bool updateUserLoginPassword(std::string uName,
+                               std::string uPassword) override;
 
 private:
   struct DBDeleter {

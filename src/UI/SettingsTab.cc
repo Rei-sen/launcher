@@ -6,27 +6,28 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/Fl_Input.H>
 
-void SettingsTab::onUpdateButton(Fl_Widget *, void *v) {
-  // test czy działa, potem usunąć
-  printf(((SettingsTab *)v)->newNameField->value());
 
-  std::string newLogin = ((SettingsTab *)v)->newNameField->value();
-  std::string newPassword = ((SettingsTab *)v)->newPasswordField->value();
-
+void SettingsTab::updateHelper(std::string newLogin, std::string newPassword) {
   if (!newLogin.empty() && !newPassword.empty()) {
     if (fl_ask("Do you really want to update data?")) {
-      // może dodać do connect metode zwracającej info czy jest użytkownik o
-      // danym loginie, bo hasło powinno móc się powtarzać
-      if (1) {
-        // if (connection.updateLogin(newLogin, newPassword)
+      if (state.getConnection().updateUserLoginPassword(newLogin,
+                                                        newPassword)) {
         fl_message("succes");
       } else {
-        //          fl_error("error");
+        fl_message("error");
       }
     }
   } else {
-    //          fl_error("error");
+    fl_message("error");
   }
+
+
+}
+
+void SettingsTab::onUpdateButton(Fl_Widget *, void *v) {
+  std::string newLogin = ((SettingsTab *)v)->newNameField->value();
+  std::string newPassword = ((SettingsTab *)v)->newPasswordField->value();
+  ((SettingsTab *)v)->updateHelper(newLogin, newPassword);
 }
 
 SettingsTab::SettingsTab(State &s) : Tab("Settings", s) {

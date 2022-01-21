@@ -235,6 +235,32 @@ std::vector<News> MockConnection::getAllNews() {
   return news;
 }
 
+bool MockConnection::updateUserLoginPassword(std::string uName,
+                                             std::string uPassword) {
+  sqlite3_stmt *stmt;
+//  userID;
+    if (sqlite3_prepare_v2(db.get(),
+                         "update users "
+                         "set name = ?, password = ? "
+                         "where id = ?;",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("updateUserLoginPassword(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return false;
+  }
+
+  sqlite3_bind_text(stmt, 1, uName.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, uPassword.c_str(), -1,
+                    SQLITE_TRANSIENT);
+  sqlite3_bind_int64(stmt, 3, userID.value());
+
+  auto result = sqlite3_step(stmt);
+
+  sqlite3_finalize(stmt);
+  
+  return result == SQLITE_DONE;
+}
 
 bool MockConnection::updateGameInfo(GameInfo info) {
   sqlite3_stmt *stmt;
