@@ -132,7 +132,8 @@ void GameLibTab::updateGamesList() {
     gameName->set_active();
     gameName->value(selectedGame.getTitle().c_str());
     updateGameDLCsList(selectedGame.getID());
-
+    
+    dlcList->set_active();
     playButton->set_active();
     uninstallButton->set_active();
     installButton->set_active();
