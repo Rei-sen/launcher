@@ -13,6 +13,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Editor.H>
 #include <UI/Tab.hh>
+#include <string>
 
 class PublisherTab : public Tab {
 public:
@@ -26,15 +27,21 @@ private:
   void initAllGroups();
   void initGameGroup();
   void initNewsGroup();
+  void initMediaGroup();
   void updateGameGroup();
   void updateNewsGroup();
+  void updateMediaGroup();
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
   static void onNewsTreeSelected(Fl_Widget *, void *);
+  static void onMediaChoiceSelected(Fl_Widget *, void *);
 
   static void onUpdateGame(Fl_Widget *, void *);
   static void onUpdateNews(Fl_Widget *, void *);
   static void onAddNews(Fl_Widget *, void *);
+  static void onUpdateMedia(Fl_Widget *, void *);
+  static void onAddMedia(Fl_Widget *, void *);
+
 
 private:
   Fl_Hold_Browser *gameBrowser;
@@ -49,6 +56,10 @@ private:
   Fl_Text_Editor *newsContent;
   Fl_Text_Buffer *newsContentBuf;
   Fl_Button *newsUpdateAdd;
+
+  std::string callback_game;
+  std::string callback_news;
+
   // socials
   Fl_Input *socialsAddress;
   Fl_Button *socialsUpdate;

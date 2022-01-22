@@ -9,7 +9,6 @@
 #include "News.hh"
 #include "SocialMedia.hh"
 
-
 class MockConnection : public Connection {
 public:
   MockConnection(const MockConnection &) = delete;
@@ -26,6 +25,9 @@ public:
 
   std::vector<GameInfo> getAllGames() override;
   std::vector<News> getAllNews() override;
+  std::vector<SocialMedia> getAllMedias() override;
+
+
   std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) override;
 
   std::unique_ptr<UserInfo> getUserInfo() override;
@@ -35,6 +37,13 @@ public:
   bool updateGameInfo(GameInfo info) override;
 
   bool updateNewsInfo(News info) override;
+
+  bool updateMediaInfo(SocialMedia info ) override;
+
+
+  std::optional<std::string> addNewsInfo(GameInfo::ID gid, std::string title,
+                                         std::string content) override;
+  std::optional<std::string> addMedia(SocialMedia medium) override;
 
   std::optional<std::string> buyGame(GameInfo::ID id) override;
   std::optional<std::string> buyDLC(GameInfo::ID gameId,

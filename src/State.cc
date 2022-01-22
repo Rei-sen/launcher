@@ -12,8 +12,10 @@ void State::update() {
   user = connection->getUserInfo();
   allGames = connection->getAllGames();
   allNews = connection->getAllNews();
+  allMedias = connection->getAllMedias();
 }
 
 std::vector<GameInfo> &State::getAllGames() { return allGames; }
 std::vector<News> &State::getAllNews() { return allNews; }
+std::vector<SocialMedia> &State::getAllMedias() { return allMedias; }
 UserInfo &State::getUser() { return *user; }
