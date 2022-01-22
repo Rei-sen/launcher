@@ -284,6 +284,33 @@ bool MockConnection::updateNewsInfo(News info) {
   return result == SQLITE_DONE;
 }
 
+std::optional<std::string> MockConnection::addNewsInfo(News info) {
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "insert into news (gameID, id, title,content) "
+                         "values(?, ?, ?, ?);",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("addNewsInfo(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return sqlite3_errmsg(db.get());
+  }
+  sqlite3_bind_int64(stmt, 1, info.getGameID());
+  sqlite3_bind_int64(stmt, 2, info.getID());
+  sqlite3_bind_text(stmt, 3, info.getTitle().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, info.getContent().c_str(), -1, SQLITE_TRANSIENT);
+
+  auto result = sqlite3_step(stmt);
+
+  sqlite3_finalize(stmt);
+
+  if (result == SQLITE_DONE)
+    return std::nullopt;
+  else
+    return sqlite3_errmsg(db.get());
+}
+
 std::optional<std::string> MockConnection::buyGame(GameInfo::ID id) {
   sqlite3_stmt *stmt;
 
