@@ -7,6 +7,7 @@
 
 #include "UserInfo.hh"
 #include "News.hh"
+#include "SocialMedia.hh"
 
 class Connection {
 public:
@@ -25,6 +26,8 @@ public:
 
   virtual std::vector<GameInfo> getAllGames() = 0;
   virtual std::vector<News> getAllNews() = 0;
+  virtual std::vector<SocialMedia> getAllMedias() = 0;
+
   // zwraca wszystkie dlc dla danej gry
   virtual std::vector<DLCInfo> getAllGamesDLCs(GameInfo::ID id) = 0;
 
@@ -36,8 +39,11 @@ public:
 
   virtual bool updateNewsInfo(News info) = 0;
 
+  virtual bool updateMediaInfo(SocialMedia info) = 0;
+
   virtual std::optional<std::string> addNewsInfo(GameInfo::ID gid, std::string title,
                                          std::string content) = 0;
+  virtual std::optional<std::string> addMedia(SocialMedia medium) = 0;
   virtual std::optional<std::string> buyGame(GameInfo::ID id) = 0;
   virtual std::optional<std::string> buyDLC(GameInfo::ID gameId,
                                             DLCInfo::ID id) = 0;

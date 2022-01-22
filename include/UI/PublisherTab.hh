@@ -27,8 +27,10 @@ private:
   void initAllGroups();
   void initGameGroup();
   void initNewsGroup();
+  void initMediaGroup();
   void updateGameGroup();
   void updateNewsGroup();
+  void updateMediaGroup();
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
   static void onNewsTreeSelected(Fl_Widget *, void *);
@@ -36,6 +38,9 @@ private:
   static void onUpdateGame(Fl_Widget *, void *);
   static void onUpdateNews(Fl_Widget *, void *);
   static void onAddNews(Fl_Widget *, void *);
+  static void onUpdateMedia(Fl_Widget *, void *);
+  static void onAddMedia(Fl_Widget *, void *);
+
 
 private:
   Fl_Hold_Browser *gameBrowser;

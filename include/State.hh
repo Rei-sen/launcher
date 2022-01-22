@@ -11,6 +11,7 @@
 #include "GameInfo.hh"
 #include "UserInfo.hh"
 #include "News.hh"
+#include "SocialMedia.hh"
 
 class State {
 public:
@@ -29,6 +30,8 @@ public:
 
   std::vector<News> &getAllNews();
 
+  std::vector<SocialMedia> &getAllMedias();
+
   UserInfo &getUser();
 
 private:
@@ -37,4 +40,5 @@ private:
 
   std::vector<GameInfo> allGames;
   std::vector<News> allNews;
+  std::vector<SocialMedia> allMedias;
 };

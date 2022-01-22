@@ -16,6 +16,7 @@
 #include <ranges>
 #include <stdexcept>
 #include <string>
+#include <regex>
 
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
@@ -69,15 +70,19 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       } // Fl_Input* o
       {
         socialsUpdate = new Fl_Button(435, 478, 69, 30, "Update");
+        socialsUpdate->callback(onUpdateMedia, (void *)this);
 
       } // Fl_Button* o
       {
         socialsPlatform = new Fl_Choice(84, 478, 120, 30, "Platform");
         socialsPlatform->down_box(FL_BORDER_BOX);
+        //socialsPlatform->callback(onUpdateMedia, (void *)this);
       } // Fl_Choice* o
       {
         socialsAddNew =
             new Fl_Button(514, 478, 75, 30, "Add new"); // onUpdateSocialButton
+        socialsAddNew->callback(onAddMedia, (void *)this);
+      
       }                                                 // Fl_Button* o
       o->end();
     } // Fl_Group* o
@@ -90,6 +95,7 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 void PublisherTab::initAllGroups() {
   initGameGroup();
   initNewsGroup();
+  initMediaGroup();
 }
 
 void PublisherTab::initGameGroup() {
@@ -123,6 +129,16 @@ void PublisherTab::initNewsGroup() {
   });
   updateNewsGroup();
   redraw();
+}
+
+void PublisherTab::initMediaGroup() {
+  std::vector<SocialMedia> medias = state.getAllMedias();
+  socialsPlatform->clear();
+  
+  for (SocialMedia m :  medias)
+  socialsPlatform->add(m.getName().c_str());
+
+  socialsAddress->value(medias[0].getAddress().c_str());
 }
 
 void PublisherTab::updateGameGroup() {
@@ -203,6 +219,16 @@ void PublisherTab::updateNewsGroup() {
     }
   }
   redraw();
+}
+
+void PublisherTab::updateMediaGroup() { 
+      std::vector<SocialMedia> medias = state.getAllMedias();
+  socialsPlatform->clear();
+
+  for (SocialMedia m : medias)
+    socialsPlatform->add(m.getName().c_str());
+
+  socialsAddress->value(medias[0].getAddress().c_str());
 }
 
 void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
@@ -297,6 +323,39 @@ void PublisherTab::onAddNews(Fl_Widget *, void *_this) {
   tab->initAllGroups();
 }
 
+void PublisherTab::onUpdateMedia(Fl_Widget *, void *_this) {
+  auto tab = (PublisherTab *)_this;
+  auto medias = tab->state.getAllMedias();
+
+  auto socialadress = tab->socialsAddress->value();
+  auto socialname = medias[tab->socialsPlatform->value()].getName();
+
+  SocialMedia s(socialname, socialadress);
+  tab->state.getConnection().updateMediaInfo(s);
+
+  tab->state.update();
+  tab->initAllGroups();
+}
+
+void PublisherTab::onAddMedia(Fl_Widget *, void *_this) {
+  auto tab = (PublisherTab *)_this;
+  std::string socialadress = tab->socialsAddress->value();
+  std::string socialname = "";
+
+  std::regex urlRe("^.*://([^/?:]+)/?.*$");
+  socialname = std::regex_replace(socialadress, urlRe, "$1");
+
+
+  SocialMedia s(socialname, socialadress);
+
+  tab->state.getConnection().addMedia(s);
+
+  tab->state.update();
+  tab->initAllGroups();
+}
+
 void PublisherTab::onNewsTreeSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateNewsGroup();
 }
+
+

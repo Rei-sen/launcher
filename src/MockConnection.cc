@@ -129,6 +129,45 @@ std::vector<News> MockConnection::getAllNews() {
   return news;
 }
 
+std::vector<SocialMedia> MockConnection::getAllMedias() {
+  sqlite3_stmt *stmt;
+  /*
+  create table 'socialMedias' (
+       'id' integer primary key autoincrement,
+       'name' text not null,
+       'address' text not null
+);
+
+insert into 'socialMedias' (name, address)
+values ('abc', 'abc.def');
+
+  */
+
+
+
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "select name, address "
+                         "from socialMedias",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("getAllMedias(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  std::vector<SocialMedia> medias;
+  while (sqlite3_step(stmt) == SQLITE_ROW) {
+
+    // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
+    medias.emplace_back((char *)sqlite3_column_text(stmt, 0),
+                      (char *)sqlite3_column_text(stmt, 1));
+  }
+
+  sqlite3_finalize(stmt);
+
+  return medias;
+}
+
 std::vector<DLCInfo> MockConnection::getAllGamesDLCs(GameInfo::ID id) {
   sqlite3_stmt *stmt;
 
@@ -284,6 +323,29 @@ bool MockConnection::updateNewsInfo(News info) {
   return result == SQLITE_DONE;
 }
 
+bool MockConnection::updateMediaInfo(SocialMedia info) { 
+  sqlite3_stmt *stmt;
+
+  if (sqlite3_prepare_v2(db.get(),
+                         "update socialMedias "
+                         "set name = ?, address = ?"
+                         "where name = ?;",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("updateNewsInfo(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return false;
+  }
+  // transient bo stringi są dealokowane po wywołaniu funkcji
+  sqlite3_bind_text(stmt, 1, info.getName().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, info.getAddress().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 3, info.getName().c_str(), -1, SQLITE_TRANSIENT);
+
+  auto result = sqlite3_step(stmt);
+
+  return result == SQLITE_DONE;
+}
+
 std::optional<std::string> MockConnection::addNewsInfo(GameInfo::ID gid,
                                                        std::string title,
                                                        std::string content) {
@@ -321,6 +383,30 @@ News::ID newsid=1; //I dont know how to do it better but at least it works now
   sqlite3_bind_text(stmt, 4, content.c_str(), -1, SQLITE_TRANSIENT);
 
   auto result = sqlite3_step(stmt);
+
+  sqlite3_finalize(stmt);
+
+  if (result == SQLITE_DONE)
+    return std::nullopt;
+  else
+    return sqlite3_errmsg(db.get());
+}
+
+std::optional<std::string> MockConnection::addMedia(SocialMedia medium) {
+  sqlite3_stmt *stmt;
+  if (sqlite3_prepare_v2(db.get(),
+                         "insert into socialMedias (name, address) "
+                         "values(?,?);",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("addMedia(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+    return sqlite3_errmsg(db.get());
+  }
+  sqlite3_bind_text(stmt, 1, medium.getName().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 2, medium.getAddress().c_str(), -1, SQLITE_TRANSIENT);
+
+    auto result = sqlite3_step(stmt);
 
   sqlite3_finalize(stmt);
 
