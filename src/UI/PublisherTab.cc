@@ -76,7 +76,7 @@ PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
       {
         socialsPlatform = new Fl_Choice(84, 478, 120, 30, "Platform");
         socialsPlatform->down_box(FL_BORDER_BOX);
-        //socialsPlatform->callback(onUpdateMedia, (void *)this);
+        socialsPlatform->callback(onMediaChoiceSelected, (void *)this);
       } // Fl_Choice* o
       {
         socialsAddNew =
@@ -134,10 +134,12 @@ void PublisherTab::initNewsGroup() {
 void PublisherTab::initMediaGroup() {
   std::vector<SocialMedia> medias = state.getAllMedias();
   socialsPlatform->clear();
-  
+  int temp = socialsPlatform->value();
+  if (temp < 0)
+    temp = 0;
   for (SocialMedia m :  medias)
   socialsPlatform->add(m.getName().c_str());
-
+  socialsPlatform->value(temp);
   socialsAddress->value(medias[0].getAddress().c_str());
 }
 
@@ -222,13 +224,9 @@ void PublisherTab::updateNewsGroup() {
 }
 
 void PublisherTab::updateMediaGroup() { 
-      std::vector<SocialMedia> medias = state.getAllMedias();
-  socialsPlatform->clear();
-
-  for (SocialMedia m : medias)
-    socialsPlatform->add(m.getName().c_str());
-
-  socialsAddress->value(medias[0].getAddress().c_str());
+  std::vector<SocialMedia> medias = state.getAllMedias();
+  int temp = socialsPlatform->value();
+  socialsAddress->value(medias[temp].getAddress().c_str());
 }
 
 void PublisherTab::onGameBrowserSelected(Fl_Widget *, void *_this) {
@@ -342,8 +340,18 @@ void PublisherTab::onAddMedia(Fl_Widget *, void *_this) {
   std::string socialadress = tab->socialsAddress->value();
   std::string socialname = "";
 
-  std::regex urlRe("^.*://([^/?:]+)/?.*$");
-  socialname = std::regex_replace(socialadress, urlRe, "$1");
+  int xd = socialadress.find_first_of("//")+2;
+  int xe = socialadress.find_first_of("www.") + 4;
+  if (xe > xd&&xe<socialadress.length())
+    xd = xe;
+  if (xd < 0)
+    xd = 0;
+  socialname = socialadress.substr(xd);
+  xe = socialname.find_first_of(".");
+  if (xe < 0)
+    return;
+  socialname = socialname.substr(0, xe);
+  //socialname = std::regex_replace(socialadress, urlRe, "$1");
 
 
   SocialMedia s(socialname, socialadress);
@@ -356,6 +364,10 @@ void PublisherTab::onAddMedia(Fl_Widget *, void *_this) {
 
 void PublisherTab::onNewsTreeSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateNewsGroup();
+}
+
+void PublisherTab::onMediaChoiceSelected(Fl_Widget *, void *_this) {
+  ((PublisherTab *)_this)->updateMediaGroup();
 }
 
 

@@ -34,6 +34,7 @@ private:
 
   static void onGameBrowserSelected(Fl_Widget *, void *);
   static void onNewsTreeSelected(Fl_Widget *, void *);
+  static void onMediaChoiceSelected(Fl_Widget *, void *);
 
   static void onUpdateGame(Fl_Widget *, void *);
   static void onUpdateNews(Fl_Widget *, void *);
