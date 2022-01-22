@@ -52,8 +52,6 @@ public:
   bool updateUserLoginPassword(std::string uName,
                                std::string uPassword) override;
 
-  std::vector<SocialMedia> getAllSocials() override;
-
 private:
   struct DBDeleter {
     void operator()(sqlite3 *ptr) { sqlite3_close(ptr); }

@@ -49,6 +49,4 @@ public:
                                             DLCInfo::ID id) = 0;
 
   virtual bool updateUserLoginPassword(std::string uName, std::string uPassword) = 0;
-
-  virtual std::vector<SocialMedia> getAllSocials() = 0;
 };

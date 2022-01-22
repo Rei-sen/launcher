@@ -41,7 +41,7 @@ public:
 
 
 void SocialMediaTab::initTab(){
-  listOfSocials = state.getConnection().getAllSocials();
+  listOfSocials = state.getConnection().getAllMedias();
   newsTable->set(listOfSocials);
 }
 

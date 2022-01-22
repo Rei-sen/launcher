@@ -9,6 +9,7 @@
 
 #include "News.hh"
 #include "PublisherInfo.hh"
+#include "SocialMedia.hh"
 
 namespace fs = std::filesystem;
 
