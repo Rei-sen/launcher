@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include <sqlite3.h>
@@ -49,6 +49,10 @@ public:
   std::optional<std::string> buyDLC(GameInfo::ID gameId,
                                     DLCInfo::ID id) override;
 
+  bool updateUserLoginPassword(std::string uName,
+                               std::string uPassword) override;
+
+  std::vector<SocialMedia> getAllSocials() override;
 
 private:
   struct DBDeleter {

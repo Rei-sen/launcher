@@ -1,4 +1,4 @@
-﻿
+
 #pragma once
 
 #include <memory>
@@ -47,4 +47,8 @@ public:
   virtual std::optional<std::string> buyGame(GameInfo::ID id) = 0;
   virtual std::optional<std::string> buyDLC(GameInfo::ID gameId,
                                             DLCInfo::ID id) = 0;
+
+  virtual bool updateUserLoginPassword(std::string uName, std::string uPassword) = 0;
+
+  virtual std::vector<SocialMedia> getAllSocials() = 0;
 };
