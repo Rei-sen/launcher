@@ -27,6 +27,9 @@ values (1, 'bezdlc', 'gra bez dlc', 10.0);
 insert into 'games' (id, name, description, price)
 values (2, 'zdlc', 'gra z dlc', 5.55);
 
+insert into 'games' (id, name, description, price)
+values (3, 'zdlc2', 'gra z dlc2', 5.234);
+
 drop table if exists 'gameOwnership';
 create table 'gameOwnership' (
        'userID' integer not null,
@@ -52,6 +55,11 @@ create table 'news' (
 
 insert into 'news' (gameID, id, title, content)
 values (1, 1, 'tytul', 'tresc');
+insert into 'news' (gameID, id, title, content)
+values (2, 1, 'tytul2', 'tresc');
+insert into 'news' (gameID, id, title, content)
+values (1, 2, 'tytul3', 'tresc');
+
 
 drop table if exists 'dlcs';
 create table 'dlcs' (

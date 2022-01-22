@@ -120,7 +120,7 @@ std::vector<News> MockConnection::getAllNews() {
     News::ID idn = sqlite3_column_int64(stmt, 1);
 
     // rzutowanie na char * ponieważ sqlite zwraca unsigned char *
-    news.emplace_back(id, idn, (char *)sqlite3_column_text(stmt, 2),
+    news.emplace_back(idn, id, (char *)sqlite3_column_text(stmt, 2),
                       (char *)sqlite3_column_text(stmt, 3));
   }
 
@@ -284,22 +284,41 @@ bool MockConnection::updateNewsInfo(News info) {
   return result == SQLITE_DONE;
 }
 
-std::optional<std::string> MockConnection::addNewsInfo(News info) {
+std::optional<std::string> MockConnection::addNewsInfo(GameInfo::ID gid,
+                                                       std::string title,
+                                                       std::string content) {
   sqlite3_stmt *stmt;
+  ///weird stuff
+  if (sqlite3_prepare_v2(db.get(),
+                         "select MAX(id) "
+                         "from news "
+                         "where gameID = ?;",
+                         -1, &stmt, nullptr)) {
+    using namespace std::string_literals;
+    throw std::runtime_error("addNewsInfo(): could not prepare statement"s +
+                             sqlite3_errmsg(db.get()));
+  }
+
+  sqlite3_bind_int64(stmt, 1, gid);
+News::ID newsid=1; //I dont know how to do it better but at least it works now 
+  if (sqlite3_step(stmt) == SQLITE_ROW) {
+  newsid = sqlite3_column_int64(stmt, 0) + 1;
+  }
+  sqlite3_finalize(stmt);
 
   if (sqlite3_prepare_v2(db.get(),
-                         "insert into news (gameID, id, title,content) "
-                         "values(?, ?, ?, ?);",
+                         "insert into news (gameID,id, title,content) "
+                         "values(?,?, ?, ?);",
                          -1, &stmt, nullptr)) {
     using namespace std::string_literals;
     throw std::runtime_error("addNewsInfo(): could not prepare statement"s +
                              sqlite3_errmsg(db.get()));
     return sqlite3_errmsg(db.get());
   }
-  sqlite3_bind_int64(stmt, 1, info.getGameID());
-  sqlite3_bind_int64(stmt, 2, info.getID());
-  sqlite3_bind_text(stmt, 3, info.getTitle().c_str(), -1, SQLITE_TRANSIENT);
-  sqlite3_bind_text(stmt, 4, info.getContent().c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_int64(stmt, 1, gid);
+  sqlite3_bind_int64(stmt, 2, newsid);
+  sqlite3_bind_text(stmt, 3, title.c_str(), -1, SQLITE_TRANSIENT);
+  sqlite3_bind_text(stmt, 4, content.c_str(), -1, SQLITE_TRANSIENT);
 
   auto result = sqlite3_step(stmt);
 
@@ -323,7 +342,7 @@ std::optional<std::string> MockConnection::buyGame(GameInfo::ID id) {
                              sqlite3_errmsg(db.get()));
     return sqlite3_errmsg(db.get());
   }
-
+  "select max(id) from news where gameID == ?";
   sqlite3_bind_int64(stmt, 1, userID.value());
   sqlite3_bind_int64(stmt, 2, id);
 

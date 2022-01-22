@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <ranges>
 #include <stdexcept>
+#include <string>
 
 PublisherTab::PublisherTab(State &s) : Tab("Publisher", s) {
 
@@ -120,8 +121,8 @@ void PublisherTab::initNewsGroup() {
     std::string temp = ("/" + gamename->getTitle() + "/" + n.getTitle());
     newsTree->add(temp.c_str());
   });
+  updateNewsGroup();
   redraw();
-  // updateGameGroup();
 }
 
 void PublisherTab::updateGameGroup() {
@@ -152,15 +153,18 @@ void PublisherTab::updateGameGroup() {
 void PublisherTab::updateNewsGroup() {
   auto news = state.getAllNews();
   auto games = state.getAllGames();
+  newsTree->root_label("Games");
 
-  if (newsTree->callback_item()->is_root()) {
-
+  if (newsTree->callback_item() == nullptr||newsTree->callback_item()->is_root() ||
+      !newsTree->callback_item()) {
     newsTitle->clear_active();
     newsTitle->value("");
     newsContent->clear_active();
     newsContentBuf->text("");
     newsUpdateAdd->clear_active();
     newsUpdateAdd->label("Add/Update");
+    callback_news = "";
+    callback_game = "";
   } else if (newsTree->callback_item()->parent()->is_root()) {
     newsTitle->set_active();
     newsTitle->value("");
@@ -168,6 +172,9 @@ void PublisherTab::updateNewsGroup() {
     newsContentBuf->text("");
     newsUpdateAdd->set_active();
     newsUpdateAdd->label("Add");
+    callback_news = "";
+    callback_game = newsTree->callback_item()->label();
+    newsUpdateAdd->callback(onAddNews, (void *)this);
 
   } else { // here get all contents of this stuff
     GameInfo::ID iddd;
@@ -189,6 +196,10 @@ void PublisherTab::updateNewsGroup() {
       newsContentBuf->text(ne2->getContent().c_str());
       newsUpdateAdd->set_active();
       newsUpdateAdd->label("Update");
+
+      callback_news = newsTree->callback_item()->label();
+      callback_game = newsTree->callback_item()->parent()->label();
+      newsUpdateAdd->callback(onUpdateNews, (void *)this);
     }
   }
   redraw();
@@ -228,18 +239,22 @@ void PublisherTab::onUpdateNews(Fl_Widget *, void *_this) {
   auto games = tab->state.getAllGames();
   auto news = tab->state.getAllNews();
   auto callback = tab->newsTree->callback_item();
+  std::string check = tab->newsTitle->value();
+  if (std::all_of(check.begin(), check.end(), isspace)||check.empty())
+    return;
+
   if (callback == nullptr || callback->parent() == nullptr ||
       callback->parent()->is_root())
     return;
 
   GameInfo::ID idG;
   News::ID idN;
-  std::string temp = tab->newsTree->callback_item()->parent()->label();
+  std::string temp = tab->callback_game;
   auto ne = std::find_if(games.begin(), games.end(),
                          [&](GameInfo n) { return n.getTitle() == temp; });
   if (ne == games.end())
     return;
-  temp = tab->newsTree->callback_item()->label();
+  temp = tab->callback_news;
   idG = ne->getID();
   auto ne2 = std::find_if(news.begin(), news.end(), [&](News n) {
     return n.getTitle() == temp && idG == n.getGameID();
@@ -256,7 +271,31 @@ void PublisherTab::onUpdateNews(Fl_Widget *, void *_this) {
   tab->initAllGroups();
 }
 
-void PublisherTab::onAddNews(Fl_Widget *, void *_this) {}
+void PublisherTab::onAddNews(Fl_Widget *, void *_this) {
+  auto tab = (PublisherTab *)_this;
+  auto games = tab->state.getAllGames();
+  auto callback = tab->newsTree->callback_item();
+  std::string check = tab->newsTitle->value();
+  if (std::all_of(check.begin(), check.end(), isspace) || check.empty())
+    return;
+
+  if (callback == nullptr || callback->parent() == nullptr )
+    return;
+  GameInfo::ID idG;
+  std::string temp = tab->callback_game;
+  auto ne = std::find_if(games.begin(), games.end(),
+                         [&](GameInfo n) { return n.getTitle() == temp; });
+  if (ne == games.end())
+    return;
+  idG = ne->getID();
+
+
+  tab->state.getConnection().addNewsInfo(idG, tab->newsTitle->value(),
+                                         tab->newsContentBuf->text());
+
+  tab->state.update();
+  tab->initAllGroups();
+}
 
 void PublisherTab::onNewsTreeSelected(Fl_Widget *, void *_this) {
   ((PublisherTab *)_this)->updateNewsGroup();

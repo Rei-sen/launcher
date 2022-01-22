@@ -36,7 +36,8 @@ public:
 
   virtual bool updateNewsInfo(News info) = 0;
 
-  virtual std::optional<std::string> addNewsInfo(News info)= 0;
+  virtual std::optional<std::string> addNewsInfo(GameInfo::ID gid, std::string title,
+                                         std::string content) = 0;
   virtual std::optional<std::string> buyGame(GameInfo::ID id) = 0;
   virtual std::optional<std::string> buyDLC(GameInfo::ID gameId,
                                             DLCInfo::ID id) = 0;

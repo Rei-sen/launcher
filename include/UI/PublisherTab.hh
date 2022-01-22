@@ -13,6 +13,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Text_Editor.H>
 #include <UI/Tab.hh>
+#include <string>
 
 class PublisherTab : public Tab {
 public:
@@ -49,6 +50,10 @@ private:
   Fl_Text_Editor *newsContent;
   Fl_Text_Buffer *newsContentBuf;
   Fl_Button *newsUpdateAdd;
+
+  std::string callback_game;
+  std::string callback_news;
+
   // socials
   Fl_Input *socialsAddress;
   Fl_Button *socialsUpdate;

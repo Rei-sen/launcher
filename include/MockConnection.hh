@@ -34,7 +34,8 @@ public:
 
   bool updateNewsInfo(News info) override;
 
-  std::optional<std::string> addNewsInfo(News info) override;
+  std::optional<std::string> addNewsInfo(GameInfo::ID gid, std::string title,
+                                         std::string content) override;
 
   std::optional<std::string> buyGame(GameInfo::ID id) override;
   std::optional<std::string> buyDLC(GameInfo::ID gameId,
