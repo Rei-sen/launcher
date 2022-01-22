@@ -91,7 +91,7 @@ values (3, 2, 1);
 drop table if exists 'socialMedias';
 create table 'socialMedias' (
        'id' integer primary key autoincrement,
-       'name' text not null,
+       'name' text not null unique,
        'address' text not null
 );
 
