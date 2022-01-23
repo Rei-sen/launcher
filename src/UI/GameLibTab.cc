@@ -40,9 +40,9 @@ void GameLibTab::updateGameDLCsList(int gameID) {
   dlcList->clear();
   ownedGameDLCsVect.clear();
 
-  GameInfo tempGame = state.getConnection().getAllGames()[gameID - 1];
+  GameInfo tempGame = state.getAllGames()[gameID - 1];
   std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> tempOwnedDlCs =
-      state.getConnection().getOwnedDLCs();
+      state.getOwnedDLCs();
 
   std::vector<DLCInfo> tempDLCs;
   for (auto ownedProd : tempOwnedDlCs) {
@@ -59,9 +59,9 @@ void GameLibTab::userSearch(std::string value) {
   int i = 0;
 
   std::vector<GameInfo> tempOwnedGames;
-  std::vector<GameInfo::ID> ownedID = state.getConnection().getOwnedGames();
+  std::vector<GameInfo::ID> ownedID = state.getOwnedGames();
   gameList->clear();
-  for (auto game : state.getConnection().getAllGames()) {
+  for (auto game : state.getAllGames()) {
     for (auto owned : ownedID) {
       if (owned == game.getID()) {
         tempOwnedGames.push_back(game);
@@ -102,9 +102,9 @@ void GameLibTab::userSearch(std::string value) {
 
 void GameLibTab::initGamesList() {
 
-  std::vector<GameInfo::ID> ownedID = state.getConnection().getOwnedGames();
+  std::vector<GameInfo::ID> ownedID = state.getOwnedGames();
   gameList->clear();
-  for (auto game : state.getConnection().getAllGames()) {
+  for (auto game : state.getAllGames()) {
     for (auto owned : ownedID) {
       if (owned == game.getID()) {
         gameList->add(game.getTitle().c_str(), (void *)this);

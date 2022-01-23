@@ -34,6 +34,10 @@ public:
 
   UserInfo &getUser();
 
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> &getOwnedDLCs();
+
+  std::vector<GameInfo::ID> &getOwnedGames();
+
 private:
   std::unique_ptr<Connection> connection;
   std::unique_ptr<UserInfo> user;
@@ -41,4 +45,6 @@ private:
   std::vector<GameInfo> allGames;
   std::vector<News> allNews;
   std::vector<SocialMedia> allMedias;
+  std::vector<std::pair<GameInfo::ID, DLCInfo::ID>> ownedDLCs;
+  std::vector<GameInfo::ID> ownedGames;
 };

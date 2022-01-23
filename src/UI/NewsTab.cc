@@ -7,8 +7,8 @@ void NewsTab::initTabData() {
   titleField->clear_active();
   contentField->clear_active();
   
-  newsVector = state.getConnection().getAllNews();
-  std::vector<GameInfo> temp = state.getConnection().getAllGames();
+  newsVector = state.getAllNews();
+  std::vector<GameInfo> temp = state.getAllGames();
 
   std::string gameNews;
   for (auto curentNews : newsVector) {
@@ -22,7 +22,7 @@ void NewsTab::initTabData() {
 
 void NewsTab::updateTabData() {
   std::string tempLabel;
-    std::vector<GameInfo> temp = state.getConnection().getAllGames();
+    std::vector<GameInfo> temp = state.getAllGames();
 
   Fl_Tree_Item *i = newsTree->first_selected_item();
   if (i != nullptr) {
