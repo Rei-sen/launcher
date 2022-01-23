@@ -29,11 +29,13 @@ public:
 
   static void onDlcBrowserClick(Fl_Widget *, void *v);
 
+  void initGamesList();
+
+
 private:
   std::vector<GameInfo> shownGames;
   std::vector<DLCInfo> shownDLCs;
 
-  void initGamesList();
   void updateGamesList();
   void updateGameDLCsList(GameInfo game);
   void loadDLCData(int gameID, int dlcID);

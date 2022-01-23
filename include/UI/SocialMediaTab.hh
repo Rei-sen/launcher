@@ -16,9 +16,10 @@ public:
   virtual ~SocialMediaTab() = default;
 
   SocialMediaTab(State &s);
+  void initTab(); 
+
 
 private:
-  void initTab(); 
 	  
 	  SocialsTable *newsTable;
   std::vector<SocialMedia> listOfSocials;

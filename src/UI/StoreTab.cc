@@ -184,7 +184,10 @@ void StoreTab::updateGamesList() {
 }
 
 void StoreTab::initGamesList() {
+
   gameList->clear();
+  shownGames.clear();
+  shownDLCs.clear();
 
   for (auto game : state.getAllGames()) {
     gameList->add(game.getTitle().c_str(), (void *)this);
