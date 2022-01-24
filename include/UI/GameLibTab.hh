@@ -24,8 +24,10 @@ public:
   static void onBrowserClick(Fl_Widget *, void *v);
   static void onDLCBrowserClick(Fl_Widget *, void *v);
 
-private:
   void initGamesList();
+
+
+private:
   void updateGamesList();
   void updateGameDLCsList(int gameID);
   void userSearch(std::string value);

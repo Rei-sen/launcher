@@ -104,6 +104,10 @@ void GameLibTab::initGamesList() {
 
   std::vector<GameInfo::ID> ownedID = state.getOwnedGames();
   gameList->clear();
+
+  shownGames.clear();
+  ownedGameDLCsVect.clear();
+
   for (auto game : state.getAllGames()) {
     for (auto owned : ownedID) {
       if (owned == game.getID()) {

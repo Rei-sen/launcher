@@ -8,18 +8,37 @@
 #include "UI/SocialMediaTab.hh"
 #include "UI/StoreTab.hh"
 
+void MainWindow::refreshAll() {
+    
+ 
+  gameLibTab->initGamesList();
+  socialMediaTab->initTab();
+  newsTab->initTabData();
+  storeTab->initGamesList();
+}
+
+
+void MyTabCallback(Fl_Widget *w, void *_this) {
+  Fl_Tabs *tabs = (Fl_Tabs *)w;
+  // When tab changed, make sure it has same color as its group
+  ((MainWindow *)_this)->refreshAll();
+  
+}
+
 MainWindow::MainWindow(State &s)
     : Fl_Double_Window(625, 455, "Game launcher") {
   user_data((void *)(this));
   {
     Fl_Tabs *tabs = new Fl_Tabs(0, 0, 625, 455);
+    tabs->callback(MyTabCallback, (void *)this);
     {
-      Fl_Group *o = new StoreTab(s);
+      storeTab = new StoreTab(s);
+      Fl_Group *o = storeTab;
       o->show();
     }                      // StoreTab* o
-    { new GameLibTab(s); } // GameLibTab* o
-    new SocialMediaTab(s);
-    new NewsTab(s);
+    { gameLibTab = new GameLibTab(s); } // GameLibTab* o
+    socialMediaTab = new SocialMediaTab(s);
+    newsTab = new NewsTab(s);
     new SettingsTab(s);
     if (true) // zamienić na state.user.hasPublisherAccess()
     {

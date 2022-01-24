@@ -18,12 +18,14 @@ public:
 
   NewsTab(State &s);
 
+  void initTabData();
+
+
 private:
   std::vector<News> newsVector;
 
   //  std::vector<GameInfo> gamesWithNewsVector;
   //
-  void initTabData();
 
   void updateTabData();
 
