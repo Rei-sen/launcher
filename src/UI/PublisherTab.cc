@@ -343,18 +343,18 @@ void PublisherTab::onAddMedia(Fl_Widget *, void *_this) {
   size_t xd = socialadress.find("//");
   size_t xe = socialadress.find("www.");
   size_t bruh = 0;
-  if (xd == std::string::npos && xe == std::string::npos)
-    bruh = 0;
-  else {
+  if (xd == std::string::npos)
+    xd = 0;
+  if (xe == std::string::npos)
+    xe = 0;
     if (xd > xe)
       bruh = xd + 2;
     else
       bruh = xe + 4;
-  }
   socialname = socialadress.substr(bruh);
   xe = socialname.find(".");
   if (xe == std::string::npos)
-    return;
+    xe= socialname.length();
   socialname = socialname.substr(0, xe);
   //socialname = std::regex_replace(socialadress, urlRe, "$1");
 
