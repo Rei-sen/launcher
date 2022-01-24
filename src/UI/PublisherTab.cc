@@ -347,10 +347,12 @@ void PublisherTab::onAddMedia(Fl_Widget *, void *_this) {
     xd = 0;
   if (xe == std::string::npos)
     xe = 0;
+  if (xd != 0 && xe != 0) {
     if (xd > xe)
       bruh = xd + 2;
     else
       bruh = xe + 4;
+  }
   socialname = socialadress.substr(bruh);
   xe = socialname.find(".");
   if (xe == std::string::npos)
